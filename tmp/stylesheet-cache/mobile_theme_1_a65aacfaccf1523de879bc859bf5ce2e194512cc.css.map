@@ -1,0 +1,14 @@
+{
+	"version": 3,
+	"file": "theme.css",
+	"sources": [
+		"theme.scss",
+		"theme_variable.scss"
+	],
+	"sourcesContent": [
+		"@import \"theme_variables\"; @import \"mobile_theme\";",
+		"$primary: #dddddd !default;\n$secondary: #222222 !default;\n$tertiary: #0f82af !default;\n$quaternary: #c14924 !default;\n$header_background: #111111 !default;\n$header_primary: #dddddd !default;\n$highlight: #a87137 !default;\n$danger: #e45735 !default;\n$success: #1ca551 !default;\n$love: #fa6c8d !default;\n"
+	],
+	"names": [],
+	"mappings": ""
+}
