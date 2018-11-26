@@ -1,6 +1,6 @@
 development:
   username: ubuntu
-  password: <%= ENV['UBUNTU_DATABASE_PASSWORD'] %>
+  password: 123456
   prepared_statements: false
   adapter: postgresql
   database: <%= ENV['DISCOURSE_DEV_DB'] || 'discourse_development' %>

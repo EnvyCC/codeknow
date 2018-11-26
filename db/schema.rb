@@ -124,7 +124,7 @@ ActiveRecord::Schema.define(version: 2018_10_31_165343) do
     t.boolean "suppress_from_latest", default: false
     t.integer "minimum_required_tags", default: 0
     t.boolean "navigate_to_first_post_after_read", default: false, null: false
-    t.index "(COALESCE(parent_category_id, (-1))), name", name: "unique_index_categories_on_name", unique: true
+    t.index "COALESCE(parent_category_id, '-1'::integer), name", name: "unique_index_categories_on_name", unique: true
     t.index ["email_in"], name: "index_categories_on_email_in", unique: true
     t.index ["topic_count"], name: "index_categories_on_topic_count"
   end
@@ -679,9 +679,9 @@ ActiveRecord::Schema.define(version: 2018_10_31_165343) do
     t.datetime "disagreed_at"
     t.integer "disagreed_by_id"
     t.index ["post_id"], name: "index_post_actions_on_post_id"
-    t.index ["user_id", "post_action_type_id", "post_id", "targets_topic"], name: "idx_unique_actions", unique: true, where: "(((deleted_at IS NULL) AND (disagreed_at IS NULL)) AND (deferred_at IS NULL))"
+    t.index ["user_id", "post_action_type_id", "post_id", "targets_topic"], name: "idx_unique_actions", unique: true, where: "((deleted_at IS NULL) AND (disagreed_at IS NULL) AND (deferred_at IS NULL))"
     t.index ["user_id", "post_action_type_id"], name: "index_post_actions_on_user_id_and_post_action_type_id", where: "(deleted_at IS NULL)"
-    t.index ["user_id", "post_id", "targets_topic"], name: "idx_unique_flags", unique: true, where: "((((deleted_at IS NULL) AND (disagreed_at IS NULL)) AND (deferred_at IS NULL)) AND (post_action_type_id = ANY (ARRAY[3, 4, 7, 8])))"
+    t.index ["user_id", "post_id", "targets_topic"], name: "idx_unique_flags", unique: true, where: "((deleted_at IS NULL) AND (disagreed_at IS NULL) AND (deferred_at IS NULL) AND (post_action_type_id = ANY (ARRAY[3, 4, 7, 8])))"
   end
 
   create_table "post_custom_fields", id: :serial, force: :cascade do |t|
@@ -1434,7 +1434,7 @@ ActiveRecord::Schema.define(version: 2018_10_31_165343) do
     t.datetime "updated_at", null: false
     t.datetime "revoked_at"
     t.text "scopes", default: [], null: false, array: true
-    t.datetime "last_used_at", default: -> { "now()" }, null: false
+    t.datetime "last_used_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
     t.index ["client_id"], name: "index_user_api_keys_on_client_id", unique: true
     t.index ["key"], name: "index_user_api_keys_on_key", unique: true
     t.index ["user_id"], name: "index_user_api_keys_on_user_id"

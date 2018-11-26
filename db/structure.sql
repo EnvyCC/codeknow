@@ -1,29 +1,18 @@
 SET statement_timeout = 0;
 SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
 SET client_min_messages = warning;
+SET row_security = off;
 
 --
 -- Name: discourse_functions; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA discourse_functions;
-
-
---
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-
-
---
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 --
@@ -54,13 +43,11 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
 COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
 
 
-SET search_path = discourse_functions, pg_catalog;
-
 --
 -- Name: raise_topic_status_updates_readonly(); Type: FUNCTION; Schema: discourse_functions; Owner: -
 --
 
-CREATE FUNCTION raise_topic_status_updates_readonly() RETURNS trigger
+CREATE FUNCTION discourse_functions.raise_topic_status_updates_readonly() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
   BEGIN
@@ -69,17 +56,15 @@ CREATE FUNCTION raise_topic_status_updates_readonly() RETURNS trigger
 $$;
 
 
-SET search_path = public, pg_catalog;
-
 SET default_tablespace = '';
 
 SET default_with_oids = false;
 
 --
--- Name: api_keys; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: api_keys; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE api_keys (
+CREATE TABLE public.api_keys (
     id integer NOT NULL,
     key character varying(64) NOT NULL,
     user_id integer,
@@ -95,7 +80,8 @@ CREATE TABLE api_keys (
 -- Name: api_keys_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE api_keys_id_seq
+CREATE SEQUENCE public.api_keys_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -107,14 +93,14 @@ CREATE SEQUENCE api_keys_id_seq
 -- Name: api_keys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE api_keys_id_seq OWNED BY api_keys.id;
+ALTER SEQUENCE public.api_keys_id_seq OWNED BY public.api_keys.id;
 
 
 --
--- Name: application_requests; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: application_requests; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE application_requests (
+CREATE TABLE public.application_requests (
     id integer NOT NULL,
     date date NOT NULL,
     req_type integer NOT NULL,
@@ -126,7 +112,8 @@ CREATE TABLE application_requests (
 -- Name: application_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE application_requests_id_seq
+CREATE SEQUENCE public.application_requests_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -138,14 +125,14 @@ CREATE SEQUENCE application_requests_id_seq
 -- Name: application_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE application_requests_id_seq OWNED BY application_requests.id;
+ALTER SEQUENCE public.application_requests_id_seq OWNED BY public.application_requests.id;
 
 
 --
--- Name: ar_internal_metadata; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: ar_internal_metadata; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE ar_internal_metadata (
+CREATE TABLE public.ar_internal_metadata (
     key character varying NOT NULL,
     value character varying,
     created_at timestamp without time zone NOT NULL,
@@ -154,10 +141,10 @@ CREATE TABLE ar_internal_metadata (
 
 
 --
--- Name: badge_groupings; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: badge_groupings; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE badge_groupings (
+CREATE TABLE public.badge_groupings (
     id integer NOT NULL,
     name character varying NOT NULL,
     description text,
@@ -171,7 +158,8 @@ CREATE TABLE badge_groupings (
 -- Name: badge_groupings_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE badge_groupings_id_seq
+CREATE SEQUENCE public.badge_groupings_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -183,14 +171,14 @@ CREATE SEQUENCE badge_groupings_id_seq
 -- Name: badge_groupings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE badge_groupings_id_seq OWNED BY badge_groupings.id;
+ALTER SEQUENCE public.badge_groupings_id_seq OWNED BY public.badge_groupings.id;
 
 
 --
--- Name: categories; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: categories; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE categories (
+CREATE TABLE public.categories (
     id integer NOT NULL,
     name character varying(50) NOT NULL,
     color character varying(6) DEFAULT '0088CC'::character varying NOT NULL,
@@ -243,10 +231,10 @@ CREATE TABLE categories (
 
 
 --
--- Name: posts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: posts; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE posts (
+CREATE TABLE public.posts (
     id integer NOT NULL,
     user_id integer,
     topic_id integer NOT NULL,
@@ -305,49 +293,49 @@ CREATE TABLE posts (
 -- Name: TABLE posts; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON TABLE posts IS 'If you want to query public posts only, use the badge_posts view.';
+COMMENT ON TABLE public.posts IS 'If you want to query public posts only, use the badge_posts view.';
 
 
 --
 -- Name: COLUMN posts.post_number; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN posts.post_number IS 'The position of this post in the topic. The pair (topic_id, post_number) forms a natural key on the posts table.';
+COMMENT ON COLUMN public.posts.post_number IS 'The position of this post in the topic. The pair (topic_id, post_number) forms a natural key on the posts table.';
 
 
 --
 -- Name: COLUMN posts.raw; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN posts.raw IS 'The raw Markdown that the user entered into the composer.';
+COMMENT ON COLUMN public.posts.raw IS 'The raw Markdown that the user entered into the composer.';
 
 
 --
 -- Name: COLUMN posts.cooked; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN posts.cooked IS 'The processed HTML that is presented in a topic.';
+COMMENT ON COLUMN public.posts.cooked IS 'The processed HTML that is presented in a topic.';
 
 
 --
 -- Name: COLUMN posts.reply_to_post_number; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN posts.reply_to_post_number IS 'If this post is a reply to another, this column is the post_number of the post it''s replying to. [FKEY posts.topic_id, posts.post_number]';
+COMMENT ON COLUMN public.posts.reply_to_post_number IS 'If this post is a reply to another, this column is the post_number of the post it''s replying to. [FKEY posts.topic_id, posts.post_number]';
 
 
 --
 -- Name: COLUMN posts.reply_quoted; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN posts.reply_quoted IS 'This column is true if the post contains a quote-reply, which causes the in-reply-to indicator to be absent.';
+COMMENT ON COLUMN public.posts.reply_quoted IS 'This column is true if the post contains a quote-reply, which causes the in-reply-to indicator to be absent.';
 
 
 --
--- Name: topics; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: topics; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE topics (
+CREATE TABLE public.topics (
     id integer NOT NULL,
     title character varying NOT NULL,
     last_posted_at timestamp without time zone,
@@ -401,14 +389,14 @@ CREATE TABLE topics (
 -- Name: TABLE topics; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON TABLE topics IS 'To query public topics only: SELECT ... FROM topics t LEFT INNER JOIN categories c ON (t.category_id = c.id AND c.read_restricted = false)';
+COMMENT ON TABLE public.topics IS 'To query public topics only: SELECT ... FROM topics t LEFT INNER JOIN categories c ON (t.category_id = c.id AND c.read_restricted = false)';
 
 
 --
 -- Name: badge_posts; Type: VIEW; Schema: public; Owner: -
 --
 
-CREATE VIEW badge_posts AS
+CREATE VIEW public.badge_posts AS
  SELECT p.id,
     p.user_id,
     p.topic_id,
@@ -460,17 +448,17 @@ CREATE VIEW badge_posts AS
     p.action_code,
     p.image_url,
     p.locked_by_id
-   FROM ((posts p
-     JOIN topics t ON ((t.id = p.topic_id)))
-     JOIN categories c ON ((c.id = t.category_id)))
-  WHERE (((((c.allow_badges AND (p.deleted_at IS NULL)) AND (t.deleted_at IS NULL)) AND (NOT c.read_restricted)) AND t.visible) AND (p.post_type = ANY (ARRAY[1, 2, 3])));
+   FROM ((public.posts p
+     JOIN public.topics t ON ((t.id = p.topic_id)))
+     JOIN public.categories c ON ((c.id = t.category_id)))
+  WHERE (c.allow_badges AND (p.deleted_at IS NULL) AND (t.deleted_at IS NULL) AND (NOT c.read_restricted) AND t.visible AND (p.post_type = ANY (ARRAY[1, 2, 3])));
 
 
 --
--- Name: badge_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: badge_types; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE badge_types (
+CREATE TABLE public.badge_types (
     id integer NOT NULL,
     name character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
@@ -482,7 +470,8 @@ CREATE TABLE badge_types (
 -- Name: badge_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE badge_types_id_seq
+CREATE SEQUENCE public.badge_types_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -494,14 +483,14 @@ CREATE SEQUENCE badge_types_id_seq
 -- Name: badge_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE badge_types_id_seq OWNED BY badge_types.id;
+ALTER SEQUENCE public.badge_types_id_seq OWNED BY public.badge_types.id;
 
 
 --
--- Name: badges; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: badges; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE badges (
+CREATE TABLE public.badges (
     id integer NOT NULL,
     name character varying NOT NULL,
     description text,
@@ -530,7 +519,8 @@ CREATE TABLE badges (
 -- Name: badges_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE badges_id_seq
+CREATE SEQUENCE public.badges_id_seq
+    AS integer
     START WITH 100
     INCREMENT BY 1
     NO MINVALUE
@@ -542,14 +532,15 @@ CREATE SEQUENCE badges_id_seq
 -- Name: badges_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE badges_id_seq OWNED BY badges.id;
+ALTER SEQUENCE public.badges_id_seq OWNED BY public.badges.id;
 
 
 --
 -- Name: categories_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE categories_id_seq
+CREATE SEQUENCE public.categories_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -561,24 +552,24 @@ CREATE SEQUENCE categories_id_seq
 -- Name: categories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE categories_id_seq OWNED BY categories.id;
+ALTER SEQUENCE public.categories_id_seq OWNED BY public.categories.id;
 
 
 --
--- Name: categories_web_hooks; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: categories_web_hooks; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE categories_web_hooks (
+CREATE TABLE public.categories_web_hooks (
     web_hook_id integer NOT NULL,
     category_id integer NOT NULL
 );
 
 
 --
--- Name: category_custom_fields; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: category_custom_fields; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE category_custom_fields (
+CREATE TABLE public.category_custom_fields (
     id integer NOT NULL,
     category_id integer NOT NULL,
     name character varying(256) NOT NULL,
@@ -592,7 +583,8 @@ CREATE TABLE category_custom_fields (
 -- Name: category_custom_fields_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE category_custom_fields_id_seq
+CREATE SEQUENCE public.category_custom_fields_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -604,14 +596,14 @@ CREATE SEQUENCE category_custom_fields_id_seq
 -- Name: category_custom_fields_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE category_custom_fields_id_seq OWNED BY category_custom_fields.id;
+ALTER SEQUENCE public.category_custom_fields_id_seq OWNED BY public.category_custom_fields.id;
 
 
 --
--- Name: category_featured_topics; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: category_featured_topics; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE category_featured_topics (
+CREATE TABLE public.category_featured_topics (
     category_id integer NOT NULL,
     topic_id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
@@ -625,7 +617,8 @@ CREATE TABLE category_featured_topics (
 -- Name: category_featured_topics_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE category_featured_topics_id_seq
+CREATE SEQUENCE public.category_featured_topics_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -637,14 +630,14 @@ CREATE SEQUENCE category_featured_topics_id_seq
 -- Name: category_featured_topics_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE category_featured_topics_id_seq OWNED BY category_featured_topics.id;
+ALTER SEQUENCE public.category_featured_topics_id_seq OWNED BY public.category_featured_topics.id;
 
 
 --
--- Name: category_groups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: category_groups; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE category_groups (
+CREATE TABLE public.category_groups (
     id integer NOT NULL,
     category_id integer NOT NULL,
     group_id integer NOT NULL,
@@ -658,7 +651,8 @@ CREATE TABLE category_groups (
 -- Name: category_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE category_groups_id_seq
+CREATE SEQUENCE public.category_groups_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -670,14 +664,14 @@ CREATE SEQUENCE category_groups_id_seq
 -- Name: category_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE category_groups_id_seq OWNED BY category_groups.id;
+ALTER SEQUENCE public.category_groups_id_seq OWNED BY public.category_groups.id;
 
 
 --
--- Name: category_search_data; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: category_search_data; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE category_search_data (
+CREATE TABLE public.category_search_data (
     category_id integer NOT NULL,
     search_data tsvector,
     raw_data text,
@@ -687,10 +681,10 @@ CREATE TABLE category_search_data (
 
 
 --
--- Name: category_tag_groups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: category_tag_groups; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE category_tag_groups (
+CREATE TABLE public.category_tag_groups (
     id integer NOT NULL,
     category_id integer NOT NULL,
     tag_group_id integer NOT NULL,
@@ -703,7 +697,8 @@ CREATE TABLE category_tag_groups (
 -- Name: category_tag_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE category_tag_groups_id_seq
+CREATE SEQUENCE public.category_tag_groups_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -715,14 +710,14 @@ CREATE SEQUENCE category_tag_groups_id_seq
 -- Name: category_tag_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE category_tag_groups_id_seq OWNED BY category_tag_groups.id;
+ALTER SEQUENCE public.category_tag_groups_id_seq OWNED BY public.category_tag_groups.id;
 
 
 --
--- Name: category_tag_stats; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: category_tag_stats; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE category_tag_stats (
+CREATE TABLE public.category_tag_stats (
     id bigint NOT NULL,
     category_id bigint NOT NULL,
     tag_id bigint NOT NULL,
@@ -734,7 +729,7 @@ CREATE TABLE category_tag_stats (
 -- Name: category_tag_stats_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE category_tag_stats_id_seq
+CREATE SEQUENCE public.category_tag_stats_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -746,14 +741,14 @@ CREATE SEQUENCE category_tag_stats_id_seq
 -- Name: category_tag_stats_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE category_tag_stats_id_seq OWNED BY category_tag_stats.id;
+ALTER SEQUENCE public.category_tag_stats_id_seq OWNED BY public.category_tag_stats.id;
 
 
 --
--- Name: category_tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: category_tags; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE category_tags (
+CREATE TABLE public.category_tags (
     id integer NOT NULL,
     category_id integer NOT NULL,
     tag_id integer NOT NULL,
@@ -766,7 +761,8 @@ CREATE TABLE category_tags (
 -- Name: category_tags_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE category_tags_id_seq
+CREATE SEQUENCE public.category_tags_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -778,14 +774,14 @@ CREATE SEQUENCE category_tags_id_seq
 -- Name: category_tags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE category_tags_id_seq OWNED BY category_tags.id;
+ALTER SEQUENCE public.category_tags_id_seq OWNED BY public.category_tags.id;
 
 
 --
--- Name: category_users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: category_users; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE category_users (
+CREATE TABLE public.category_users (
     id integer NOT NULL,
     category_id integer NOT NULL,
     user_id integer NOT NULL,
@@ -797,7 +793,8 @@ CREATE TABLE category_users (
 -- Name: category_users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE category_users_id_seq
+CREATE SEQUENCE public.category_users_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -809,14 +806,14 @@ CREATE SEQUENCE category_users_id_seq
 -- Name: category_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE category_users_id_seq OWNED BY category_users.id;
+ALTER SEQUENCE public.category_users_id_seq OWNED BY public.category_users.id;
 
 
 --
--- Name: child_themes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: child_themes; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE child_themes (
+CREATE TABLE public.child_themes (
     id integer NOT NULL,
     parent_theme_id integer,
     child_theme_id integer,
@@ -829,7 +826,8 @@ CREATE TABLE child_themes (
 -- Name: child_themes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE child_themes_id_seq
+CREATE SEQUENCE public.child_themes_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -841,14 +839,14 @@ CREATE SEQUENCE child_themes_id_seq
 -- Name: child_themes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE child_themes_id_seq OWNED BY child_themes.id;
+ALTER SEQUENCE public.child_themes_id_seq OWNED BY public.child_themes.id;
 
 
 --
--- Name: color_scheme_colors; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: color_scheme_colors; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE color_scheme_colors (
+CREATE TABLE public.color_scheme_colors (
     id integer NOT NULL,
     name character varying NOT NULL,
     hex character varying NOT NULL,
@@ -862,7 +860,8 @@ CREATE TABLE color_scheme_colors (
 -- Name: color_scheme_colors_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE color_scheme_colors_id_seq
+CREATE SEQUENCE public.color_scheme_colors_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -874,14 +873,14 @@ CREATE SEQUENCE color_scheme_colors_id_seq
 -- Name: color_scheme_colors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE color_scheme_colors_id_seq OWNED BY color_scheme_colors.id;
+ALTER SEQUENCE public.color_scheme_colors_id_seq OWNED BY public.color_scheme_colors.id;
 
 
 --
--- Name: color_schemes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: color_schemes; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE color_schemes (
+CREATE TABLE public.color_schemes (
     id integer NOT NULL,
     name character varying NOT NULL,
     version integer DEFAULT 1 NOT NULL,
@@ -897,7 +896,8 @@ CREATE TABLE color_schemes (
 -- Name: color_schemes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE color_schemes_id_seq
+CREATE SEQUENCE public.color_schemes_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -909,14 +909,14 @@ CREATE SEQUENCE color_schemes_id_seq
 -- Name: color_schemes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE color_schemes_id_seq OWNED BY color_schemes.id;
+ALTER SEQUENCE public.color_schemes_id_seq OWNED BY public.color_schemes.id;
 
 
 --
--- Name: custom_emojis; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: custom_emojis; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE custom_emojis (
+CREATE TABLE public.custom_emojis (
     id integer NOT NULL,
     name character varying NOT NULL,
     upload_id integer NOT NULL,
@@ -929,7 +929,8 @@ CREATE TABLE custom_emojis (
 -- Name: custom_emojis_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE custom_emojis_id_seq
+CREATE SEQUENCE public.custom_emojis_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -941,14 +942,14 @@ CREATE SEQUENCE custom_emojis_id_seq
 -- Name: custom_emojis_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE custom_emojis_id_seq OWNED BY custom_emojis.id;
+ALTER SEQUENCE public.custom_emojis_id_seq OWNED BY public.custom_emojis.id;
 
 
 --
--- Name: developers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: developers; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE developers (
+CREATE TABLE public.developers (
     id integer NOT NULL,
     user_id integer NOT NULL
 );
@@ -958,7 +959,8 @@ CREATE TABLE developers (
 -- Name: developers_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE developers_id_seq
+CREATE SEQUENCE public.developers_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -970,14 +972,14 @@ CREATE SEQUENCE developers_id_seq
 -- Name: developers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE developers_id_seq OWNED BY developers.id;
+ALTER SEQUENCE public.developers_id_seq OWNED BY public.developers.id;
 
 
 --
--- Name: directory_items; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: directory_items; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE directory_items (
+CREATE TABLE public.directory_items (
     id integer NOT NULL,
     period_type integer NOT NULL,
     user_id integer NOT NULL,
@@ -997,7 +999,8 @@ CREATE TABLE directory_items (
 -- Name: directory_items_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE directory_items_id_seq
+CREATE SEQUENCE public.directory_items_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1009,14 +1012,14 @@ CREATE SEQUENCE directory_items_id_seq
 -- Name: directory_items_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE directory_items_id_seq OWNED BY directory_items.id;
+ALTER SEQUENCE public.directory_items_id_seq OWNED BY public.directory_items.id;
 
 
 --
--- Name: draft_sequences; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: draft_sequences; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE draft_sequences (
+CREATE TABLE public.draft_sequences (
     id integer NOT NULL,
     user_id integer NOT NULL,
     draft_key character varying NOT NULL,
@@ -1028,7 +1031,8 @@ CREATE TABLE draft_sequences (
 -- Name: draft_sequences_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE draft_sequences_id_seq
+CREATE SEQUENCE public.draft_sequences_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1040,14 +1044,14 @@ CREATE SEQUENCE draft_sequences_id_seq
 -- Name: draft_sequences_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE draft_sequences_id_seq OWNED BY draft_sequences.id;
+ALTER SEQUENCE public.draft_sequences_id_seq OWNED BY public.draft_sequences.id;
 
 
 --
--- Name: drafts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: drafts; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE drafts (
+CREATE TABLE public.drafts (
     id integer NOT NULL,
     user_id integer NOT NULL,
     draft_key character varying NOT NULL,
@@ -1063,7 +1067,8 @@ CREATE TABLE drafts (
 -- Name: drafts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE drafts_id_seq
+CREATE SEQUENCE public.drafts_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1075,14 +1080,14 @@ CREATE SEQUENCE drafts_id_seq
 -- Name: drafts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE drafts_id_seq OWNED BY drafts.id;
+ALTER SEQUENCE public.drafts_id_seq OWNED BY public.drafts.id;
 
 
 --
--- Name: email_change_requests; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: email_change_requests; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE email_change_requests (
+CREATE TABLE public.email_change_requests (
     id integer NOT NULL,
     user_id integer NOT NULL,
     old_email character varying NOT NULL,
@@ -1099,7 +1104,8 @@ CREATE TABLE email_change_requests (
 -- Name: email_change_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE email_change_requests_id_seq
+CREATE SEQUENCE public.email_change_requests_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1111,14 +1117,14 @@ CREATE SEQUENCE email_change_requests_id_seq
 -- Name: email_change_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE email_change_requests_id_seq OWNED BY email_change_requests.id;
+ALTER SEQUENCE public.email_change_requests_id_seq OWNED BY public.email_change_requests.id;
 
 
 --
--- Name: email_logs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: email_logs; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE email_logs (
+CREATE TABLE public.email_logs (
     id integer NOT NULL,
     to_address character varying NOT NULL,
     email_type character varying NOT NULL,
@@ -1136,7 +1142,8 @@ CREATE TABLE email_logs (
 -- Name: email_logs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE email_logs_id_seq
+CREATE SEQUENCE public.email_logs_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1148,14 +1155,14 @@ CREATE SEQUENCE email_logs_id_seq
 -- Name: email_logs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE email_logs_id_seq OWNED BY email_logs.id;
+ALTER SEQUENCE public.email_logs_id_seq OWNED BY public.email_logs.id;
 
 
 --
--- Name: email_tokens; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: email_tokens; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE email_tokens (
+CREATE TABLE public.email_tokens (
     id integer NOT NULL,
     user_id integer NOT NULL,
     email character varying NOT NULL,
@@ -1171,7 +1178,8 @@ CREATE TABLE email_tokens (
 -- Name: email_tokens_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE email_tokens_id_seq
+CREATE SEQUENCE public.email_tokens_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1183,14 +1191,14 @@ CREATE SEQUENCE email_tokens_id_seq
 -- Name: email_tokens_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE email_tokens_id_seq OWNED BY email_tokens.id;
+ALTER SEQUENCE public.email_tokens_id_seq OWNED BY public.email_tokens.id;
 
 
 --
--- Name: embeddable_hosts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: embeddable_hosts; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE embeddable_hosts (
+CREATE TABLE public.embeddable_hosts (
     id integer NOT NULL,
     host character varying NOT NULL,
     category_id integer NOT NULL,
@@ -1205,7 +1213,8 @@ CREATE TABLE embeddable_hosts (
 -- Name: embeddable_hosts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE embeddable_hosts_id_seq
+CREATE SEQUENCE public.embeddable_hosts_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1217,14 +1226,14 @@ CREATE SEQUENCE embeddable_hosts_id_seq
 -- Name: embeddable_hosts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE embeddable_hosts_id_seq OWNED BY embeddable_hosts.id;
+ALTER SEQUENCE public.embeddable_hosts_id_seq OWNED BY public.embeddable_hosts.id;
 
 
 --
--- Name: facebook_user_infos; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: facebook_user_infos; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE facebook_user_infos (
+CREATE TABLE public.facebook_user_infos (
     id integer NOT NULL,
     user_id integer NOT NULL,
     facebook_user_id bigint NOT NULL,
@@ -1248,7 +1257,8 @@ CREATE TABLE facebook_user_infos (
 -- Name: facebook_user_infos_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE facebook_user_infos_id_seq
+CREATE SEQUENCE public.facebook_user_infos_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1260,14 +1270,14 @@ CREATE SEQUENCE facebook_user_infos_id_seq
 -- Name: facebook_user_infos_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE facebook_user_infos_id_seq OWNED BY facebook_user_infos.id;
+ALTER SEQUENCE public.facebook_user_infos_id_seq OWNED BY public.facebook_user_infos.id;
 
 
 --
--- Name: github_user_infos; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: github_user_infos; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE github_user_infos (
+CREATE TABLE public.github_user_infos (
     id integer NOT NULL,
     user_id integer NOT NULL,
     screen_name character varying NOT NULL,
@@ -1281,7 +1291,8 @@ CREATE TABLE github_user_infos (
 -- Name: github_user_infos_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE github_user_infos_id_seq
+CREATE SEQUENCE public.github_user_infos_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1293,14 +1304,14 @@ CREATE SEQUENCE github_user_infos_id_seq
 -- Name: github_user_infos_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE github_user_infos_id_seq OWNED BY github_user_infos.id;
+ALTER SEQUENCE public.github_user_infos_id_seq OWNED BY public.github_user_infos.id;
 
 
 --
--- Name: given_daily_likes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: given_daily_likes; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE given_daily_likes (
+CREATE TABLE public.given_daily_likes (
     user_id integer NOT NULL,
     likes_given integer NOT NULL,
     given_date date NOT NULL,
@@ -1309,10 +1320,10 @@ CREATE TABLE given_daily_likes (
 
 
 --
--- Name: google_user_infos; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: google_user_infos; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE google_user_infos (
+CREATE TABLE public.google_user_infos (
     id integer NOT NULL,
     user_id integer NOT NULL,
     google_user_id character varying NOT NULL,
@@ -1333,7 +1344,8 @@ CREATE TABLE google_user_infos (
 -- Name: google_user_infos_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE google_user_infos_id_seq
+CREATE SEQUENCE public.google_user_infos_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1345,14 +1357,14 @@ CREATE SEQUENCE google_user_infos_id_seq
 -- Name: google_user_infos_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE google_user_infos_id_seq OWNED BY google_user_infos.id;
+ALTER SEQUENCE public.google_user_infos_id_seq OWNED BY public.google_user_infos.id;
 
 
 --
--- Name: group_archived_messages; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: group_archived_messages; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE group_archived_messages (
+CREATE TABLE public.group_archived_messages (
     id integer NOT NULL,
     group_id integer NOT NULL,
     topic_id integer NOT NULL,
@@ -1365,7 +1377,8 @@ CREATE TABLE group_archived_messages (
 -- Name: group_archived_messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE group_archived_messages_id_seq
+CREATE SEQUENCE public.group_archived_messages_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1377,14 +1390,14 @@ CREATE SEQUENCE group_archived_messages_id_seq
 -- Name: group_archived_messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE group_archived_messages_id_seq OWNED BY group_archived_messages.id;
+ALTER SEQUENCE public.group_archived_messages_id_seq OWNED BY public.group_archived_messages.id;
 
 
 --
--- Name: group_custom_fields; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: group_custom_fields; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE group_custom_fields (
+CREATE TABLE public.group_custom_fields (
     id integer NOT NULL,
     group_id integer NOT NULL,
     name character varying(256) NOT NULL,
@@ -1398,7 +1411,8 @@ CREATE TABLE group_custom_fields (
 -- Name: group_custom_fields_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE group_custom_fields_id_seq
+CREATE SEQUENCE public.group_custom_fields_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1410,14 +1424,14 @@ CREATE SEQUENCE group_custom_fields_id_seq
 -- Name: group_custom_fields_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE group_custom_fields_id_seq OWNED BY group_custom_fields.id;
+ALTER SEQUENCE public.group_custom_fields_id_seq OWNED BY public.group_custom_fields.id;
 
 
 --
--- Name: group_histories; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: group_histories; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE group_histories (
+CREATE TABLE public.group_histories (
     id integer NOT NULL,
     group_id integer NOT NULL,
     acting_user_id integer NOT NULL,
@@ -1435,7 +1449,8 @@ CREATE TABLE group_histories (
 -- Name: group_histories_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE group_histories_id_seq
+CREATE SEQUENCE public.group_histories_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1447,14 +1462,14 @@ CREATE SEQUENCE group_histories_id_seq
 -- Name: group_histories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE group_histories_id_seq OWNED BY group_histories.id;
+ALTER SEQUENCE public.group_histories_id_seq OWNED BY public.group_histories.id;
 
 
 --
--- Name: group_mentions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: group_mentions; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE group_mentions (
+CREATE TABLE public.group_mentions (
     id integer NOT NULL,
     post_id integer,
     group_id integer,
@@ -1467,7 +1482,8 @@ CREATE TABLE group_mentions (
 -- Name: group_mentions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE group_mentions_id_seq
+CREATE SEQUENCE public.group_mentions_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1479,14 +1495,14 @@ CREATE SEQUENCE group_mentions_id_seq
 -- Name: group_mentions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE group_mentions_id_seq OWNED BY group_mentions.id;
+ALTER SEQUENCE public.group_mentions_id_seq OWNED BY public.group_mentions.id;
 
 
 --
--- Name: group_users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: group_users; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE group_users (
+CREATE TABLE public.group_users (
     id integer NOT NULL,
     group_id integer NOT NULL,
     user_id integer NOT NULL,
@@ -1501,7 +1517,8 @@ CREATE TABLE group_users (
 -- Name: group_users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE group_users_id_seq
+CREATE SEQUENCE public.group_users_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1513,14 +1530,14 @@ CREATE SEQUENCE group_users_id_seq
 -- Name: group_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE group_users_id_seq OWNED BY group_users.id;
+ALTER SEQUENCE public.group_users_id_seq OWNED BY public.group_users.id;
 
 
 --
--- Name: groups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: groups; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE groups (
+CREATE TABLE public.groups (
     id integer NOT NULL,
     name character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
@@ -1555,7 +1572,8 @@ CREATE TABLE groups (
 -- Name: groups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE groups_id_seq
+CREATE SEQUENCE public.groups_id_seq
+    AS integer
     START WITH 100
     INCREMENT BY 1
     NO MINVALUE
@@ -1567,24 +1585,24 @@ CREATE SEQUENCE groups_id_seq
 -- Name: groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE groups_id_seq OWNED BY groups.id;
+ALTER SEQUENCE public.groups_id_seq OWNED BY public.groups.id;
 
 
 --
--- Name: groups_web_hooks; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: groups_web_hooks; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE groups_web_hooks (
+CREATE TABLE public.groups_web_hooks (
     web_hook_id integer NOT NULL,
     group_id integer NOT NULL
 );
 
 
 --
--- Name: incoming_domains; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: incoming_domains; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE incoming_domains (
+CREATE TABLE public.incoming_domains (
     id integer NOT NULL,
     name character varying(100) NOT NULL,
     https boolean DEFAULT false NOT NULL,
@@ -1596,7 +1614,8 @@ CREATE TABLE incoming_domains (
 -- Name: incoming_domains_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE incoming_domains_id_seq
+CREATE SEQUENCE public.incoming_domains_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1608,14 +1627,14 @@ CREATE SEQUENCE incoming_domains_id_seq
 -- Name: incoming_domains_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE incoming_domains_id_seq OWNED BY incoming_domains.id;
+ALTER SEQUENCE public.incoming_domains_id_seq OWNED BY public.incoming_domains.id;
 
 
 --
--- Name: incoming_emails; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: incoming_emails; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE incoming_emails (
+CREATE TABLE public.incoming_emails (
     id integer NOT NULL,
     user_id integer,
     topic_id integer,
@@ -1639,7 +1658,8 @@ CREATE TABLE incoming_emails (
 -- Name: incoming_emails_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE incoming_emails_id_seq
+CREATE SEQUENCE public.incoming_emails_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1651,14 +1671,14 @@ CREATE SEQUENCE incoming_emails_id_seq
 -- Name: incoming_emails_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE incoming_emails_id_seq OWNED BY incoming_emails.id;
+ALTER SEQUENCE public.incoming_emails_id_seq OWNED BY public.incoming_emails.id;
 
 
 --
--- Name: incoming_links; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: incoming_links; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE incoming_links (
+CREATE TABLE public.incoming_links (
     id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
     user_id integer,
@@ -1673,7 +1693,8 @@ CREATE TABLE incoming_links (
 -- Name: incoming_links_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE incoming_links_id_seq
+CREATE SEQUENCE public.incoming_links_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1685,14 +1706,14 @@ CREATE SEQUENCE incoming_links_id_seq
 -- Name: incoming_links_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE incoming_links_id_seq OWNED BY incoming_links.id;
+ALTER SEQUENCE public.incoming_links_id_seq OWNED BY public.incoming_links.id;
 
 
 --
--- Name: incoming_referers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: incoming_referers; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE incoming_referers (
+CREATE TABLE public.incoming_referers (
     id integer NOT NULL,
     path character varying(1000) NOT NULL,
     incoming_domain_id integer NOT NULL
@@ -1703,7 +1724,8 @@ CREATE TABLE incoming_referers (
 -- Name: incoming_referers_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE incoming_referers_id_seq
+CREATE SEQUENCE public.incoming_referers_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1715,14 +1737,14 @@ CREATE SEQUENCE incoming_referers_id_seq
 -- Name: incoming_referers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE incoming_referers_id_seq OWNED BY incoming_referers.id;
+ALTER SEQUENCE public.incoming_referers_id_seq OWNED BY public.incoming_referers.id;
 
 
 --
--- Name: instagram_user_infos; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: instagram_user_infos; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE instagram_user_infos (
+CREATE TABLE public.instagram_user_infos (
     id integer NOT NULL,
     user_id integer,
     screen_name character varying,
@@ -1736,7 +1758,8 @@ CREATE TABLE instagram_user_infos (
 -- Name: instagram_user_infos_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE instagram_user_infos_id_seq
+CREATE SEQUENCE public.instagram_user_infos_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1748,14 +1771,14 @@ CREATE SEQUENCE instagram_user_infos_id_seq
 -- Name: instagram_user_infos_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE instagram_user_infos_id_seq OWNED BY instagram_user_infos.id;
+ALTER SEQUENCE public.instagram_user_infos_id_seq OWNED BY public.instagram_user_infos.id;
 
 
 --
--- Name: invited_groups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: invited_groups; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE invited_groups (
+CREATE TABLE public.invited_groups (
     id integer NOT NULL,
     group_id integer,
     invite_id integer,
@@ -1768,7 +1791,8 @@ CREATE TABLE invited_groups (
 -- Name: invited_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE invited_groups_id_seq
+CREATE SEQUENCE public.invited_groups_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1780,14 +1804,14 @@ CREATE SEQUENCE invited_groups_id_seq
 -- Name: invited_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE invited_groups_id_seq OWNED BY invited_groups.id;
+ALTER SEQUENCE public.invited_groups_id_seq OWNED BY public.invited_groups.id;
 
 
 --
--- Name: invites; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: invites; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE invites (
+CREATE TABLE public.invites (
     id integer NOT NULL,
     invite_key character varying(32) NOT NULL,
     email character varying,
@@ -1808,7 +1832,8 @@ CREATE TABLE invites (
 -- Name: invites_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE invites_id_seq
+CREATE SEQUENCE public.invites_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1820,14 +1845,14 @@ CREATE SEQUENCE invites_id_seq
 -- Name: invites_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE invites_id_seq OWNED BY invites.id;
+ALTER SEQUENCE public.invites_id_seq OWNED BY public.invites.id;
 
 
 --
--- Name: javascript_caches; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: javascript_caches; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE javascript_caches (
+CREATE TABLE public.javascript_caches (
     id bigint NOT NULL,
     theme_field_id bigint NOT NULL,
     digest character varying,
@@ -1841,7 +1866,7 @@ CREATE TABLE javascript_caches (
 -- Name: javascript_caches_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE javascript_caches_id_seq
+CREATE SEQUENCE public.javascript_caches_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1853,14 +1878,14 @@ CREATE SEQUENCE javascript_caches_id_seq
 -- Name: javascript_caches_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE javascript_caches_id_seq OWNED BY javascript_caches.id;
+ALTER SEQUENCE public.javascript_caches_id_seq OWNED BY public.javascript_caches.id;
 
 
 --
--- Name: message_bus; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: message_bus; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE message_bus (
+CREATE TABLE public.message_bus (
     id integer NOT NULL,
     name character varying,
     context character varying,
@@ -1873,7 +1898,8 @@ CREATE TABLE message_bus (
 -- Name: message_bus_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE message_bus_id_seq
+CREATE SEQUENCE public.message_bus_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1885,14 +1911,14 @@ CREATE SEQUENCE message_bus_id_seq
 -- Name: message_bus_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE message_bus_id_seq OWNED BY message_bus.id;
+ALTER SEQUENCE public.message_bus_id_seq OWNED BY public.message_bus.id;
 
 
 --
--- Name: muted_users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: muted_users; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE muted_users (
+CREATE TABLE public.muted_users (
     id integer NOT NULL,
     user_id integer NOT NULL,
     muted_user_id integer NOT NULL,
@@ -1905,7 +1931,8 @@ CREATE TABLE muted_users (
 -- Name: muted_users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE muted_users_id_seq
+CREATE SEQUENCE public.muted_users_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1917,14 +1944,14 @@ CREATE SEQUENCE muted_users_id_seq
 -- Name: muted_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE muted_users_id_seq OWNED BY muted_users.id;
+ALTER SEQUENCE public.muted_users_id_seq OWNED BY public.muted_users.id;
 
 
 --
--- Name: notifications; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: notifications; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE notifications (
+CREATE TABLE public.notifications (
     id integer NOT NULL,
     notification_type integer NOT NULL,
     user_id integer NOT NULL,
@@ -1942,7 +1969,8 @@ CREATE TABLE notifications (
 -- Name: notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE notifications_id_seq
+CREATE SEQUENCE public.notifications_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1954,14 +1982,14 @@ CREATE SEQUENCE notifications_id_seq
 -- Name: notifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE notifications_id_seq OWNED BY notifications.id;
+ALTER SEQUENCE public.notifications_id_seq OWNED BY public.notifications.id;
 
 
 --
--- Name: oauth2_user_infos; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: oauth2_user_infos; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE oauth2_user_infos (
+CREATE TABLE public.oauth2_user_infos (
     id integer NOT NULL,
     user_id integer NOT NULL,
     uid character varying NOT NULL,
@@ -1977,7 +2005,8 @@ CREATE TABLE oauth2_user_infos (
 -- Name: oauth2_user_infos_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE oauth2_user_infos_id_seq
+CREATE SEQUENCE public.oauth2_user_infos_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1989,14 +2018,14 @@ CREATE SEQUENCE oauth2_user_infos_id_seq
 -- Name: oauth2_user_infos_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE oauth2_user_infos_id_seq OWNED BY oauth2_user_infos.id;
+ALTER SEQUENCE public.oauth2_user_infos_id_seq OWNED BY public.oauth2_user_infos.id;
 
 
 --
--- Name: onceoff_logs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: onceoff_logs; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE onceoff_logs (
+CREATE TABLE public.onceoff_logs (
     id integer NOT NULL,
     job_name character varying,
     created_at timestamp without time zone NOT NULL,
@@ -2008,7 +2037,8 @@ CREATE TABLE onceoff_logs (
 -- Name: onceoff_logs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE onceoff_logs_id_seq
+CREATE SEQUENCE public.onceoff_logs_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2020,14 +2050,14 @@ CREATE SEQUENCE onceoff_logs_id_seq
 -- Name: onceoff_logs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE onceoff_logs_id_seq OWNED BY onceoff_logs.id;
+ALTER SEQUENCE public.onceoff_logs_id_seq OWNED BY public.onceoff_logs.id;
 
 
 --
--- Name: optimized_images; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: optimized_images; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE optimized_images (
+CREATE TABLE public.optimized_images (
     id integer NOT NULL,
     sha1 character varying(40) NOT NULL,
     extension character varying(10) NOT NULL,
@@ -2043,7 +2073,8 @@ CREATE TABLE optimized_images (
 -- Name: optimized_images_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE optimized_images_id_seq
+CREATE SEQUENCE public.optimized_images_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2055,14 +2086,14 @@ CREATE SEQUENCE optimized_images_id_seq
 -- Name: optimized_images_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE optimized_images_id_seq OWNED BY optimized_images.id;
+ALTER SEQUENCE public.optimized_images_id_seq OWNED BY public.optimized_images.id;
 
 
 --
--- Name: permalinks; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: permalinks; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE permalinks (
+CREATE TABLE public.permalinks (
     id integer NOT NULL,
     url character varying(1000) NOT NULL,
     topic_id integer,
@@ -2078,7 +2109,8 @@ CREATE TABLE permalinks (
 -- Name: permalinks_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE permalinks_id_seq
+CREATE SEQUENCE public.permalinks_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2090,14 +2122,14 @@ CREATE SEQUENCE permalinks_id_seq
 -- Name: permalinks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE permalinks_id_seq OWNED BY permalinks.id;
+ALTER SEQUENCE public.permalinks_id_seq OWNED BY public.permalinks.id;
 
 
 --
--- Name: plugin_store_rows; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: plugin_store_rows; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE plugin_store_rows (
+CREATE TABLE public.plugin_store_rows (
     id integer NOT NULL,
     plugin_name character varying NOT NULL,
     key character varying NOT NULL,
@@ -2110,7 +2142,8 @@ CREATE TABLE plugin_store_rows (
 -- Name: plugin_store_rows_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE plugin_store_rows_id_seq
+CREATE SEQUENCE public.plugin_store_rows_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2122,14 +2155,14 @@ CREATE SEQUENCE plugin_store_rows_id_seq
 -- Name: plugin_store_rows_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE plugin_store_rows_id_seq OWNED BY plugin_store_rows.id;
+ALTER SEQUENCE public.plugin_store_rows_id_seq OWNED BY public.plugin_store_rows.id;
 
 
 --
--- Name: post_action_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: post_action_types; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE post_action_types (
+CREATE TABLE public.post_action_types (
     name_key character varying(50) NOT NULL,
     is_flag boolean DEFAULT false NOT NULL,
     icon character varying(20),
@@ -2144,7 +2177,8 @@ CREATE TABLE post_action_types (
 -- Name: post_action_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE post_action_types_id_seq
+CREATE SEQUENCE public.post_action_types_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2156,14 +2190,14 @@ CREATE SEQUENCE post_action_types_id_seq
 -- Name: post_action_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE post_action_types_id_seq OWNED BY post_action_types.id;
+ALTER SEQUENCE public.post_action_types_id_seq OWNED BY public.post_action_types.id;
 
 
 --
--- Name: post_actions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: post_actions; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE post_actions (
+CREATE TABLE public.post_actions (
     id integer NOT NULL,
     post_id integer NOT NULL,
     user_id integer NOT NULL,
@@ -2188,7 +2222,8 @@ CREATE TABLE post_actions (
 -- Name: post_actions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE post_actions_id_seq
+CREATE SEQUENCE public.post_actions_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2200,14 +2235,14 @@ CREATE SEQUENCE post_actions_id_seq
 -- Name: post_actions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE post_actions_id_seq OWNED BY post_actions.id;
+ALTER SEQUENCE public.post_actions_id_seq OWNED BY public.post_actions.id;
 
 
 --
--- Name: post_custom_fields; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: post_custom_fields; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE post_custom_fields (
+CREATE TABLE public.post_custom_fields (
     id integer NOT NULL,
     post_id integer NOT NULL,
     name character varying(256) NOT NULL,
@@ -2221,7 +2256,8 @@ CREATE TABLE post_custom_fields (
 -- Name: post_custom_fields_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE post_custom_fields_id_seq
+CREATE SEQUENCE public.post_custom_fields_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2233,14 +2269,14 @@ CREATE SEQUENCE post_custom_fields_id_seq
 -- Name: post_custom_fields_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE post_custom_fields_id_seq OWNED BY post_custom_fields.id;
+ALTER SEQUENCE public.post_custom_fields_id_seq OWNED BY public.post_custom_fields.id;
 
 
 --
--- Name: post_details; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: post_details; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE post_details (
+CREATE TABLE public.post_details (
     id integer NOT NULL,
     post_id integer,
     key character varying,
@@ -2255,7 +2291,8 @@ CREATE TABLE post_details (
 -- Name: post_details_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE post_details_id_seq
+CREATE SEQUENCE public.post_details_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2267,14 +2304,14 @@ CREATE SEQUENCE post_details_id_seq
 -- Name: post_details_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE post_details_id_seq OWNED BY post_details.id;
+ALTER SEQUENCE public.post_details_id_seq OWNED BY public.post_details.id;
 
 
 --
--- Name: post_replies; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: post_replies; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE post_replies (
+CREATE TABLE public.post_replies (
     post_id integer,
     reply_id integer,
     created_at timestamp without time zone NOT NULL,
@@ -2283,10 +2320,10 @@ CREATE TABLE post_replies (
 
 
 --
--- Name: post_reply_keys; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: post_reply_keys; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE post_reply_keys (
+CREATE TABLE public.post_reply_keys (
     id bigint NOT NULL,
     user_id integer NOT NULL,
     post_id integer NOT NULL,
@@ -2300,7 +2337,7 @@ CREATE TABLE post_reply_keys (
 -- Name: post_reply_keys_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE post_reply_keys_id_seq
+CREATE SEQUENCE public.post_reply_keys_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2312,14 +2349,14 @@ CREATE SEQUENCE post_reply_keys_id_seq
 -- Name: post_reply_keys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE post_reply_keys_id_seq OWNED BY post_reply_keys.id;
+ALTER SEQUENCE public.post_reply_keys_id_seq OWNED BY public.post_reply_keys.id;
 
 
 --
--- Name: post_revisions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: post_revisions; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE post_revisions (
+CREATE TABLE public.post_revisions (
     id integer NOT NULL,
     user_id integer,
     post_id integer,
@@ -2335,7 +2372,8 @@ CREATE TABLE post_revisions (
 -- Name: post_revisions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE post_revisions_id_seq
+CREATE SEQUENCE public.post_revisions_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2347,14 +2385,14 @@ CREATE SEQUENCE post_revisions_id_seq
 -- Name: post_revisions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE post_revisions_id_seq OWNED BY post_revisions.id;
+ALTER SEQUENCE public.post_revisions_id_seq OWNED BY public.post_revisions.id;
 
 
 --
--- Name: post_search_data; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: post_search_data; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE post_search_data (
+CREATE TABLE public.post_search_data (
     post_id integer NOT NULL,
     search_data tsvector,
     raw_data text,
@@ -2364,10 +2402,10 @@ CREATE TABLE post_search_data (
 
 
 --
--- Name: post_stats; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: post_stats; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE post_stats (
+CREATE TABLE public.post_stats (
     id integer NOT NULL,
     post_id integer,
     drafts_saved integer,
@@ -2382,7 +2420,8 @@ CREATE TABLE post_stats (
 -- Name: post_stats_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE post_stats_id_seq
+CREATE SEQUENCE public.post_stats_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2394,14 +2433,14 @@ CREATE SEQUENCE post_stats_id_seq
 -- Name: post_stats_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE post_stats_id_seq OWNED BY post_stats.id;
+ALTER SEQUENCE public.post_stats_id_seq OWNED BY public.post_stats.id;
 
 
 --
--- Name: post_timings; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: post_timings; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE post_timings (
+CREATE TABLE public.post_timings (
     topic_id integer NOT NULL,
     post_number integer NOT NULL,
     user_id integer NOT NULL,
@@ -2410,10 +2449,10 @@ CREATE TABLE post_timings (
 
 
 --
--- Name: post_uploads; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: post_uploads; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE post_uploads (
+CREATE TABLE public.post_uploads (
     id integer NOT NULL,
     post_id integer NOT NULL,
     upload_id integer NOT NULL
@@ -2424,7 +2463,8 @@ CREATE TABLE post_uploads (
 -- Name: post_uploads_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE post_uploads_id_seq
+CREATE SEQUENCE public.post_uploads_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2436,14 +2476,15 @@ CREATE SEQUENCE post_uploads_id_seq
 -- Name: post_uploads_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE post_uploads_id_seq OWNED BY post_uploads.id;
+ALTER SEQUENCE public.post_uploads_id_seq OWNED BY public.post_uploads.id;
 
 
 --
 -- Name: posts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE posts_id_seq
+CREATE SEQUENCE public.posts_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2455,14 +2496,14 @@ CREATE SEQUENCE posts_id_seq
 -- Name: posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE posts_id_seq OWNED BY posts.id;
+ALTER SEQUENCE public.posts_id_seq OWNED BY public.posts.id;
 
 
 --
--- Name: push_subscriptions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: push_subscriptions; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE push_subscriptions (
+CREATE TABLE public.push_subscriptions (
     id bigint NOT NULL,
     user_id integer NOT NULL,
     data character varying NOT NULL,
@@ -2475,7 +2516,7 @@ CREATE TABLE push_subscriptions (
 -- Name: push_subscriptions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE push_subscriptions_id_seq
+CREATE SEQUENCE public.push_subscriptions_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2487,14 +2528,14 @@ CREATE SEQUENCE push_subscriptions_id_seq
 -- Name: push_subscriptions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE push_subscriptions_id_seq OWNED BY push_subscriptions.id;
+ALTER SEQUENCE public.push_subscriptions_id_seq OWNED BY public.push_subscriptions.id;
 
 
 --
--- Name: queued_posts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: queued_posts; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE queued_posts (
+CREATE TABLE public.queued_posts (
     id integer NOT NULL,
     queue character varying NOT NULL,
     state integer NOT NULL,
@@ -2515,7 +2556,8 @@ CREATE TABLE queued_posts (
 -- Name: queued_posts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE queued_posts_id_seq
+CREATE SEQUENCE public.queued_posts_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2527,14 +2569,14 @@ CREATE SEQUENCE queued_posts_id_seq
 -- Name: queued_posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE queued_posts_id_seq OWNED BY queued_posts.id;
+ALTER SEQUENCE public.queued_posts_id_seq OWNED BY public.queued_posts.id;
 
 
 --
--- Name: quoted_posts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: quoted_posts; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE quoted_posts (
+CREATE TABLE public.quoted_posts (
     id integer NOT NULL,
     post_id integer NOT NULL,
     quoted_post_id integer NOT NULL,
@@ -2547,7 +2589,8 @@ CREATE TABLE quoted_posts (
 -- Name: quoted_posts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE quoted_posts_id_seq
+CREATE SEQUENCE public.quoted_posts_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2559,14 +2602,14 @@ CREATE SEQUENCE quoted_posts_id_seq
 -- Name: quoted_posts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE quoted_posts_id_seq OWNED BY quoted_posts.id;
+ALTER SEQUENCE public.quoted_posts_id_seq OWNED BY public.quoted_posts.id;
 
 
 --
--- Name: remote_themes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: remote_themes; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE remote_themes (
+CREATE TABLE public.remote_themes (
     id integer NOT NULL,
     remote_url character varying NOT NULL,
     remote_version character varying,
@@ -2587,7 +2630,8 @@ CREATE TABLE remote_themes (
 -- Name: remote_themes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE remote_themes_id_seq
+CREATE SEQUENCE public.remote_themes_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2599,14 +2643,14 @@ CREATE SEQUENCE remote_themes_id_seq
 -- Name: remote_themes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE remote_themes_id_seq OWNED BY remote_themes.id;
+ALTER SEQUENCE public.remote_themes_id_seq OWNED BY public.remote_themes.id;
 
 
 --
--- Name: scheduler_stats; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: scheduler_stats; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE scheduler_stats (
+CREATE TABLE public.scheduler_stats (
     id integer NOT NULL,
     name character varying NOT NULL,
     hostname character varying NOT NULL,
@@ -2624,7 +2668,8 @@ CREATE TABLE scheduler_stats (
 -- Name: scheduler_stats_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE scheduler_stats_id_seq
+CREATE SEQUENCE public.scheduler_stats_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2636,14 +2681,14 @@ CREATE SEQUENCE scheduler_stats_id_seq
 -- Name: scheduler_stats_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE scheduler_stats_id_seq OWNED BY scheduler_stats.id;
+ALTER SEQUENCE public.scheduler_stats_id_seq OWNED BY public.scheduler_stats.id;
 
 
 --
--- Name: schema_migration_details; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: schema_migration_details; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE schema_migration_details (
+CREATE TABLE public.schema_migration_details (
     id integer NOT NULL,
     version character varying NOT NULL,
     name character varying,
@@ -2660,7 +2705,8 @@ CREATE TABLE schema_migration_details (
 -- Name: schema_migration_details_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE schema_migration_details_id_seq
+CREATE SEQUENCE public.schema_migration_details_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2672,23 +2718,23 @@ CREATE SEQUENCE schema_migration_details_id_seq
 -- Name: schema_migration_details_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE schema_migration_details_id_seq OWNED BY schema_migration_details.id;
+ALTER SEQUENCE public.schema_migration_details_id_seq OWNED BY public.schema_migration_details.id;
 
 
 --
--- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE schema_migrations (
+CREATE TABLE public.schema_migrations (
     version character varying NOT NULL
 );
 
 
 --
--- Name: screened_emails; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: screened_emails; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE screened_emails (
+CREATE TABLE public.screened_emails (
     id integer NOT NULL,
     email character varying NOT NULL,
     action_type integer NOT NULL,
@@ -2704,7 +2750,8 @@ CREATE TABLE screened_emails (
 -- Name: screened_emails_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE screened_emails_id_seq
+CREATE SEQUENCE public.screened_emails_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2716,14 +2763,14 @@ CREATE SEQUENCE screened_emails_id_seq
 -- Name: screened_emails_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE screened_emails_id_seq OWNED BY screened_emails.id;
+ALTER SEQUENCE public.screened_emails_id_seq OWNED BY public.screened_emails.id;
 
 
 --
--- Name: screened_ip_addresses; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: screened_ip_addresses; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE screened_ip_addresses (
+CREATE TABLE public.screened_ip_addresses (
     id integer NOT NULL,
     ip_address inet NOT NULL,
     action_type integer NOT NULL,
@@ -2738,7 +2785,8 @@ CREATE TABLE screened_ip_addresses (
 -- Name: screened_ip_addresses_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE screened_ip_addresses_id_seq
+CREATE SEQUENCE public.screened_ip_addresses_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2750,14 +2798,14 @@ CREATE SEQUENCE screened_ip_addresses_id_seq
 -- Name: screened_ip_addresses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE screened_ip_addresses_id_seq OWNED BY screened_ip_addresses.id;
+ALTER SEQUENCE public.screened_ip_addresses_id_seq OWNED BY public.screened_ip_addresses.id;
 
 
 --
--- Name: screened_urls; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: screened_urls; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE screened_urls (
+CREATE TABLE public.screened_urls (
     id integer NOT NULL,
     url character varying NOT NULL,
     domain character varying NOT NULL,
@@ -2774,7 +2822,8 @@ CREATE TABLE screened_urls (
 -- Name: screened_urls_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE screened_urls_id_seq
+CREATE SEQUENCE public.screened_urls_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2786,14 +2835,14 @@ CREATE SEQUENCE screened_urls_id_seq
 -- Name: screened_urls_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE screened_urls_id_seq OWNED BY screened_urls.id;
+ALTER SEQUENCE public.screened_urls_id_seq OWNED BY public.screened_urls.id;
 
 
 --
--- Name: search_logs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: search_logs; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE search_logs (
+CREATE TABLE public.search_logs (
     id integer NOT NULL,
     term character varying NOT NULL,
     user_id integer,
@@ -2809,7 +2858,8 @@ CREATE TABLE search_logs (
 -- Name: search_logs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE search_logs_id_seq
+CREATE SEQUENCE public.search_logs_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2821,14 +2871,14 @@ CREATE SEQUENCE search_logs_id_seq
 -- Name: search_logs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE search_logs_id_seq OWNED BY search_logs.id;
+ALTER SEQUENCE public.search_logs_id_seq OWNED BY public.search_logs.id;
 
 
 --
--- Name: shared_drafts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: shared_drafts; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE shared_drafts (
+CREATE TABLE public.shared_drafts (
     topic_id integer NOT NULL,
     category_id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
@@ -2841,7 +2891,7 @@ CREATE TABLE shared_drafts (
 -- Name: shared_drafts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE shared_drafts_id_seq
+CREATE SEQUENCE public.shared_drafts_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2853,14 +2903,14 @@ CREATE SEQUENCE shared_drafts_id_seq
 -- Name: shared_drafts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE shared_drafts_id_seq OWNED BY shared_drafts.id;
+ALTER SEQUENCE public.shared_drafts_id_seq OWNED BY public.shared_drafts.id;
 
 
 --
--- Name: single_sign_on_records; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: single_sign_on_records; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE single_sign_on_records (
+CREATE TABLE public.single_sign_on_records (
     id integer NOT NULL,
     user_id integer NOT NULL,
     external_id character varying NOT NULL,
@@ -2880,7 +2930,8 @@ CREATE TABLE single_sign_on_records (
 -- Name: single_sign_on_records_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE single_sign_on_records_id_seq
+CREATE SEQUENCE public.single_sign_on_records_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2892,14 +2943,14 @@ CREATE SEQUENCE single_sign_on_records_id_seq
 -- Name: single_sign_on_records_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE single_sign_on_records_id_seq OWNED BY single_sign_on_records.id;
+ALTER SEQUENCE public.single_sign_on_records_id_seq OWNED BY public.single_sign_on_records.id;
 
 
 --
--- Name: site_settings; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: site_settings; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE site_settings (
+CREATE TABLE public.site_settings (
     id integer NOT NULL,
     name character varying NOT NULL,
     data_type integer NOT NULL,
@@ -2913,7 +2964,8 @@ CREATE TABLE site_settings (
 -- Name: site_settings_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE site_settings_id_seq
+CREATE SEQUENCE public.site_settings_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2925,14 +2977,14 @@ CREATE SEQUENCE site_settings_id_seq
 -- Name: site_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE site_settings_id_seq OWNED BY site_settings.id;
+ALTER SEQUENCE public.site_settings_id_seq OWNED BY public.site_settings.id;
 
 
 --
--- Name: skipped_email_logs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: skipped_email_logs; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE skipped_email_logs (
+CREATE TABLE public.skipped_email_logs (
     id bigint NOT NULL,
     email_type character varying NOT NULL,
     to_address character varying NOT NULL,
@@ -2949,7 +3001,7 @@ CREATE TABLE skipped_email_logs (
 -- Name: skipped_email_logs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE skipped_email_logs_id_seq
+CREATE SEQUENCE public.skipped_email_logs_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2961,21 +3013,21 @@ CREATE SEQUENCE skipped_email_logs_id_seq
 -- Name: skipped_email_logs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE skipped_email_logs_id_seq OWNED BY skipped_email_logs.id;
+ALTER SEQUENCE public.skipped_email_logs_id_seq OWNED BY public.skipped_email_logs.id;
 
 
 --
--- Name: stylesheet_cache; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: stylesheet_cache; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE stylesheet_cache (
+CREATE TABLE public.stylesheet_cache (
     id integer NOT NULL,
     target character varying NOT NULL,
     digest character varying NOT NULL,
     content text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    theme_id integer DEFAULT (-1) NOT NULL,
+    theme_id integer DEFAULT '-1'::integer NOT NULL,
     source_map text
 );
 
@@ -2984,7 +3036,8 @@ CREATE TABLE stylesheet_cache (
 -- Name: stylesheet_cache_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE stylesheet_cache_id_seq
+CREATE SEQUENCE public.stylesheet_cache_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2996,14 +3049,14 @@ CREATE SEQUENCE stylesheet_cache_id_seq
 -- Name: stylesheet_cache_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE stylesheet_cache_id_seq OWNED BY stylesheet_cache.id;
+ALTER SEQUENCE public.stylesheet_cache_id_seq OWNED BY public.stylesheet_cache.id;
 
 
 --
--- Name: tag_group_memberships; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: tag_group_memberships; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE tag_group_memberships (
+CREATE TABLE public.tag_group_memberships (
     id integer NOT NULL,
     tag_id integer NOT NULL,
     tag_group_id integer NOT NULL,
@@ -3016,7 +3069,8 @@ CREATE TABLE tag_group_memberships (
 -- Name: tag_group_memberships_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE tag_group_memberships_id_seq
+CREATE SEQUENCE public.tag_group_memberships_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3028,14 +3082,14 @@ CREATE SEQUENCE tag_group_memberships_id_seq
 -- Name: tag_group_memberships_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE tag_group_memberships_id_seq OWNED BY tag_group_memberships.id;
+ALTER SEQUENCE public.tag_group_memberships_id_seq OWNED BY public.tag_group_memberships.id;
 
 
 --
--- Name: tag_group_permissions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: tag_group_permissions; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE tag_group_permissions (
+CREATE TABLE public.tag_group_permissions (
     id bigint NOT NULL,
     tag_group_id bigint NOT NULL,
     group_id bigint NOT NULL,
@@ -3049,7 +3103,7 @@ CREATE TABLE tag_group_permissions (
 -- Name: tag_group_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE tag_group_permissions_id_seq
+CREATE SEQUENCE public.tag_group_permissions_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3061,14 +3115,14 @@ CREATE SEQUENCE tag_group_permissions_id_seq
 -- Name: tag_group_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE tag_group_permissions_id_seq OWNED BY tag_group_permissions.id;
+ALTER SEQUENCE public.tag_group_permissions_id_seq OWNED BY public.tag_group_permissions.id;
 
 
 --
--- Name: tag_groups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: tag_groups; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE tag_groups (
+CREATE TABLE public.tag_groups (
     id integer NOT NULL,
     name character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
@@ -3082,7 +3136,8 @@ CREATE TABLE tag_groups (
 -- Name: tag_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE tag_groups_id_seq
+CREATE SEQUENCE public.tag_groups_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3094,14 +3149,14 @@ CREATE SEQUENCE tag_groups_id_seq
 -- Name: tag_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE tag_groups_id_seq OWNED BY tag_groups.id;
+ALTER SEQUENCE public.tag_groups_id_seq OWNED BY public.tag_groups.id;
 
 
 --
--- Name: tag_search_data; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: tag_search_data; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE tag_search_data (
+CREATE TABLE public.tag_search_data (
     tag_id integer NOT NULL,
     search_data tsvector,
     raw_data text,
@@ -3114,7 +3169,8 @@ CREATE TABLE tag_search_data (
 -- Name: tag_search_data_tag_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE tag_search_data_tag_id_seq
+CREATE SEQUENCE public.tag_search_data_tag_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3126,14 +3182,14 @@ CREATE SEQUENCE tag_search_data_tag_id_seq
 -- Name: tag_search_data_tag_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE tag_search_data_tag_id_seq OWNED BY tag_search_data.tag_id;
+ALTER SEQUENCE public.tag_search_data_tag_id_seq OWNED BY public.tag_search_data.tag_id;
 
 
 --
--- Name: tag_users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: tag_users; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE tag_users (
+CREATE TABLE public.tag_users (
     id integer NOT NULL,
     tag_id integer NOT NULL,
     user_id integer NOT NULL,
@@ -3147,7 +3203,8 @@ CREATE TABLE tag_users (
 -- Name: tag_users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE tag_users_id_seq
+CREATE SEQUENCE public.tag_users_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3159,14 +3216,14 @@ CREATE SEQUENCE tag_users_id_seq
 -- Name: tag_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE tag_users_id_seq OWNED BY tag_users.id;
+ALTER SEQUENCE public.tag_users_id_seq OWNED BY public.tag_users.id;
 
 
 --
--- Name: tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: tags; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE tags (
+CREATE TABLE public.tags (
     id integer NOT NULL,
     name character varying NOT NULL,
     topic_count integer DEFAULT 0 NOT NULL,
@@ -3180,7 +3237,8 @@ CREATE TABLE tags (
 -- Name: tags_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE tags_id_seq
+CREATE SEQUENCE public.tags_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3192,14 +3250,14 @@ CREATE SEQUENCE tags_id_seq
 -- Name: tags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE tags_id_seq OWNED BY tags.id;
+ALTER SEQUENCE public.tags_id_seq OWNED BY public.tags.id;
 
 
 --
--- Name: theme_fields; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: theme_fields; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE theme_fields (
+CREATE TABLE public.theme_fields (
     id integer NOT NULL,
     theme_id integer NOT NULL,
     target_id integer NOT NULL,
@@ -3219,7 +3277,8 @@ CREATE TABLE theme_fields (
 -- Name: theme_fields_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE theme_fields_id_seq
+CREATE SEQUENCE public.theme_fields_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3231,14 +3290,14 @@ CREATE SEQUENCE theme_fields_id_seq
 -- Name: theme_fields_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE theme_fields_id_seq OWNED BY theme_fields.id;
+ALTER SEQUENCE public.theme_fields_id_seq OWNED BY public.theme_fields.id;
 
 
 --
--- Name: theme_settings; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: theme_settings; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE theme_settings (
+CREATE TABLE public.theme_settings (
     id bigint NOT NULL,
     name character varying(255) NOT NULL,
     data_type integer NOT NULL,
@@ -3253,7 +3312,7 @@ CREATE TABLE theme_settings (
 -- Name: theme_settings_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE theme_settings_id_seq
+CREATE SEQUENCE public.theme_settings_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3265,14 +3324,14 @@ CREATE SEQUENCE theme_settings_id_seq
 -- Name: theme_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE theme_settings_id_seq OWNED BY theme_settings.id;
+ALTER SEQUENCE public.theme_settings_id_seq OWNED BY public.theme_settings.id;
 
 
 --
--- Name: themes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: themes; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE themes (
+CREATE TABLE public.themes (
     id integer NOT NULL,
     name character varying NOT NULL,
     user_id integer NOT NULL,
@@ -3291,7 +3350,8 @@ CREATE TABLE themes (
 -- Name: themes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE themes_id_seq
+CREATE SEQUENCE public.themes_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3303,14 +3363,14 @@ CREATE SEQUENCE themes_id_seq
 -- Name: themes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE themes_id_seq OWNED BY themes.id;
+ALTER SEQUENCE public.themes_id_seq OWNED BY public.themes.id;
 
 
 --
--- Name: top_topics; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: top_topics; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE top_topics (
+CREATE TABLE public.top_topics (
     id integer NOT NULL,
     topic_id integer,
     yearly_posts_count integer DEFAULT 0 NOT NULL,
@@ -3346,7 +3406,8 @@ CREATE TABLE top_topics (
 -- Name: top_topics_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE top_topics_id_seq
+CREATE SEQUENCE public.top_topics_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3358,14 +3419,14 @@ CREATE SEQUENCE top_topics_id_seq
 -- Name: top_topics_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE top_topics_id_seq OWNED BY top_topics.id;
+ALTER SEQUENCE public.top_topics_id_seq OWNED BY public.top_topics.id;
 
 
 --
--- Name: topic_allowed_groups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_allowed_groups; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE topic_allowed_groups (
+CREATE TABLE public.topic_allowed_groups (
     id integer NOT NULL,
     group_id integer NOT NULL,
     topic_id integer NOT NULL
@@ -3376,7 +3437,8 @@ CREATE TABLE topic_allowed_groups (
 -- Name: topic_allowed_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE topic_allowed_groups_id_seq
+CREATE SEQUENCE public.topic_allowed_groups_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3388,14 +3450,14 @@ CREATE SEQUENCE topic_allowed_groups_id_seq
 -- Name: topic_allowed_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE topic_allowed_groups_id_seq OWNED BY topic_allowed_groups.id;
+ALTER SEQUENCE public.topic_allowed_groups_id_seq OWNED BY public.topic_allowed_groups.id;
 
 
 --
--- Name: topic_allowed_users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_allowed_users; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE topic_allowed_users (
+CREATE TABLE public.topic_allowed_users (
     id integer NOT NULL,
     user_id integer NOT NULL,
     topic_id integer NOT NULL,
@@ -3408,7 +3470,8 @@ CREATE TABLE topic_allowed_users (
 -- Name: topic_allowed_users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE topic_allowed_users_id_seq
+CREATE SEQUENCE public.topic_allowed_users_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3420,14 +3483,14 @@ CREATE SEQUENCE topic_allowed_users_id_seq
 -- Name: topic_allowed_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE topic_allowed_users_id_seq OWNED BY topic_allowed_users.id;
+ALTER SEQUENCE public.topic_allowed_users_id_seq OWNED BY public.topic_allowed_users.id;
 
 
 --
--- Name: topic_custom_fields; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_custom_fields; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE topic_custom_fields (
+CREATE TABLE public.topic_custom_fields (
     id integer NOT NULL,
     topic_id integer NOT NULL,
     name character varying(256) NOT NULL,
@@ -3441,7 +3504,8 @@ CREATE TABLE topic_custom_fields (
 -- Name: topic_custom_fields_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE topic_custom_fields_id_seq
+CREATE SEQUENCE public.topic_custom_fields_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3453,14 +3517,14 @@ CREATE SEQUENCE topic_custom_fields_id_seq
 -- Name: topic_custom_fields_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE topic_custom_fields_id_seq OWNED BY topic_custom_fields.id;
+ALTER SEQUENCE public.topic_custom_fields_id_seq OWNED BY public.topic_custom_fields.id;
 
 
 --
--- Name: topic_embeds; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_embeds; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE topic_embeds (
+CREATE TABLE public.topic_embeds (
     id integer NOT NULL,
     topic_id integer NOT NULL,
     post_id integer NOT NULL,
@@ -3477,7 +3541,8 @@ CREATE TABLE topic_embeds (
 -- Name: topic_embeds_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE topic_embeds_id_seq
+CREATE SEQUENCE public.topic_embeds_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3489,14 +3554,14 @@ CREATE SEQUENCE topic_embeds_id_seq
 -- Name: topic_embeds_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE topic_embeds_id_seq OWNED BY topic_embeds.id;
+ALTER SEQUENCE public.topic_embeds_id_seq OWNED BY public.topic_embeds.id;
 
 
 --
--- Name: topic_invites; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_invites; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE topic_invites (
+CREATE TABLE public.topic_invites (
     id integer NOT NULL,
     topic_id integer NOT NULL,
     invite_id integer NOT NULL,
@@ -3509,7 +3574,8 @@ CREATE TABLE topic_invites (
 -- Name: topic_invites_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE topic_invites_id_seq
+CREATE SEQUENCE public.topic_invites_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3521,14 +3587,14 @@ CREATE SEQUENCE topic_invites_id_seq
 -- Name: topic_invites_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE topic_invites_id_seq OWNED BY topic_invites.id;
+ALTER SEQUENCE public.topic_invites_id_seq OWNED BY public.topic_invites.id;
 
 
 --
--- Name: topic_link_clicks; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_link_clicks; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE topic_link_clicks (
+CREATE TABLE public.topic_link_clicks (
     id integer NOT NULL,
     topic_link_id integer NOT NULL,
     user_id integer,
@@ -3542,7 +3608,8 @@ CREATE TABLE topic_link_clicks (
 -- Name: topic_link_clicks_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE topic_link_clicks_id_seq
+CREATE SEQUENCE public.topic_link_clicks_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3554,14 +3621,14 @@ CREATE SEQUENCE topic_link_clicks_id_seq
 -- Name: topic_link_clicks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE topic_link_clicks_id_seq OWNED BY topic_link_clicks.id;
+ALTER SEQUENCE public.topic_link_clicks_id_seq OWNED BY public.topic_link_clicks.id;
 
 
 --
--- Name: topic_links; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_links; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE topic_links (
+CREATE TABLE public.topic_links (
     id integer NOT NULL,
     topic_id integer NOT NULL,
     post_id integer,
@@ -3586,7 +3653,8 @@ CREATE TABLE topic_links (
 -- Name: topic_links_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE topic_links_id_seq
+CREATE SEQUENCE public.topic_links_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3598,14 +3666,14 @@ CREATE SEQUENCE topic_links_id_seq
 -- Name: topic_links_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE topic_links_id_seq OWNED BY topic_links.id;
+ALTER SEQUENCE public.topic_links_id_seq OWNED BY public.topic_links.id;
 
 
 --
--- Name: topic_search_data; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_search_data; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE topic_search_data (
+CREATE TABLE public.topic_search_data (
     topic_id integer NOT NULL,
     raw_data text,
     locale character varying NOT NULL,
@@ -3618,7 +3686,8 @@ CREATE TABLE topic_search_data (
 -- Name: topic_search_data_topic_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE topic_search_data_topic_id_seq
+CREATE SEQUENCE public.topic_search_data_topic_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3630,14 +3699,14 @@ CREATE SEQUENCE topic_search_data_topic_id_seq
 -- Name: topic_search_data_topic_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE topic_search_data_topic_id_seq OWNED BY topic_search_data.topic_id;
+ALTER SEQUENCE public.topic_search_data_topic_id_seq OWNED BY public.topic_search_data.topic_id;
 
 
 --
--- Name: topic_tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_tags; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE topic_tags (
+CREATE TABLE public.topic_tags (
     id integer NOT NULL,
     topic_id integer NOT NULL,
     tag_id integer NOT NULL,
@@ -3650,7 +3719,8 @@ CREATE TABLE topic_tags (
 -- Name: topic_tags_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE topic_tags_id_seq
+CREATE SEQUENCE public.topic_tags_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3662,14 +3732,14 @@ CREATE SEQUENCE topic_tags_id_seq
 -- Name: topic_tags_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE topic_tags_id_seq OWNED BY topic_tags.id;
+ALTER SEQUENCE public.topic_tags_id_seq OWNED BY public.topic_tags.id;
 
 
 --
--- Name: topic_timers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_timers; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE topic_timers (
+CREATE TABLE public.topic_timers (
     id integer NOT NULL,
     execute_at timestamp without time zone NOT NULL,
     status_type integer NOT NULL,
@@ -3689,7 +3759,8 @@ CREATE TABLE topic_timers (
 -- Name: topic_timers_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE topic_timers_id_seq
+CREATE SEQUENCE public.topic_timers_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3701,14 +3772,14 @@ CREATE SEQUENCE topic_timers_id_seq
 -- Name: topic_timers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE topic_timers_id_seq OWNED BY topic_timers.id;
+ALTER SEQUENCE public.topic_timers_id_seq OWNED BY public.topic_timers.id;
 
 
 --
--- Name: topic_users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_users; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE topic_users (
+CREATE TABLE public.topic_users (
     user_id integer NOT NULL,
     topic_id integer NOT NULL,
     posted boolean DEFAULT false NOT NULL,
@@ -3732,7 +3803,8 @@ CREATE TABLE topic_users (
 -- Name: topic_users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE topic_users_id_seq
+CREATE SEQUENCE public.topic_users_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3744,14 +3816,14 @@ CREATE SEQUENCE topic_users_id_seq
 -- Name: topic_users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE topic_users_id_seq OWNED BY topic_users.id;
+ALTER SEQUENCE public.topic_users_id_seq OWNED BY public.topic_users.id;
 
 
 --
--- Name: topic_views; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_views; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE topic_views (
+CREATE TABLE public.topic_views (
     topic_id integer NOT NULL,
     viewed_at date NOT NULL,
     user_id integer,
@@ -3763,7 +3835,8 @@ CREATE TABLE topic_views (
 -- Name: topics_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE topics_id_seq
+CREATE SEQUENCE public.topics_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3775,14 +3848,14 @@ CREATE SEQUENCE topics_id_seq
 -- Name: topics_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE topics_id_seq OWNED BY topics.id;
+ALTER SEQUENCE public.topics_id_seq OWNED BY public.topics.id;
 
 
 --
--- Name: translation_overrides; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: translation_overrides; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE translation_overrides (
+CREATE TABLE public.translation_overrides (
     id integer NOT NULL,
     locale character varying NOT NULL,
     translation_key character varying NOT NULL,
@@ -3797,7 +3870,8 @@ CREATE TABLE translation_overrides (
 -- Name: translation_overrides_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE translation_overrides_id_seq
+CREATE SEQUENCE public.translation_overrides_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3809,14 +3883,14 @@ CREATE SEQUENCE translation_overrides_id_seq
 -- Name: translation_overrides_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE translation_overrides_id_seq OWNED BY translation_overrides.id;
+ALTER SEQUENCE public.translation_overrides_id_seq OWNED BY public.translation_overrides.id;
 
 
 --
--- Name: twitter_user_infos; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: twitter_user_infos; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE twitter_user_infos (
+CREATE TABLE public.twitter_user_infos (
     id integer NOT NULL,
     user_id integer NOT NULL,
     screen_name character varying NOT NULL,
@@ -3831,7 +3905,8 @@ CREATE TABLE twitter_user_infos (
 -- Name: twitter_user_infos_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE twitter_user_infos_id_seq
+CREATE SEQUENCE public.twitter_user_infos_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3843,14 +3918,14 @@ CREATE SEQUENCE twitter_user_infos_id_seq
 -- Name: twitter_user_infos_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE twitter_user_infos_id_seq OWNED BY twitter_user_infos.id;
+ALTER SEQUENCE public.twitter_user_infos_id_seq OWNED BY public.twitter_user_infos.id;
 
 
 --
--- Name: unsubscribe_keys; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: unsubscribe_keys; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE unsubscribe_keys (
+CREATE TABLE public.unsubscribe_keys (
     key character varying(64) NOT NULL,
     user_id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
@@ -3862,10 +3937,10 @@ CREATE TABLE unsubscribe_keys (
 
 
 --
--- Name: uploads; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: uploads; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE uploads (
+CREATE TABLE public.uploads (
     id integer NOT NULL,
     user_id integer NOT NULL,
     original_filename character varying NOT NULL,
@@ -3888,7 +3963,8 @@ CREATE TABLE uploads (
 -- Name: uploads_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE uploads_id_seq
+CREATE SEQUENCE public.uploads_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3900,14 +3976,14 @@ CREATE SEQUENCE uploads_id_seq
 -- Name: uploads_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE uploads_id_seq OWNED BY uploads.id;
+ALTER SEQUENCE public.uploads_id_seq OWNED BY public.uploads.id;
 
 
 --
--- Name: user_actions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_actions; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_actions (
+CREATE TABLE public.user_actions (
     id integer NOT NULL,
     action_type integer NOT NULL,
     user_id integer NOT NULL,
@@ -3925,7 +4001,8 @@ CREATE TABLE user_actions (
 -- Name: user_actions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE user_actions_id_seq
+CREATE SEQUENCE public.user_actions_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3937,14 +4014,14 @@ CREATE SEQUENCE user_actions_id_seq
 -- Name: user_actions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_actions_id_seq OWNED BY user_actions.id;
+ALTER SEQUENCE public.user_actions_id_seq OWNED BY public.user_actions.id;
 
 
 --
--- Name: user_api_keys; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_api_keys; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_api_keys (
+CREATE TABLE public.user_api_keys (
     id integer NOT NULL,
     user_id integer NOT NULL,
     client_id character varying NOT NULL,
@@ -3955,7 +4032,7 @@ CREATE TABLE user_api_keys (
     updated_at timestamp without time zone NOT NULL,
     revoked_at timestamp without time zone,
     scopes text[] DEFAULT '{}'::text[] NOT NULL,
-    last_used_at timestamp without time zone DEFAULT now() NOT NULL
+    last_used_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -3963,7 +4040,8 @@ CREATE TABLE user_api_keys (
 -- Name: user_api_keys_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE user_api_keys_id_seq
+CREATE SEQUENCE public.user_api_keys_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3975,14 +4053,14 @@ CREATE SEQUENCE user_api_keys_id_seq
 -- Name: user_api_keys_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_api_keys_id_seq OWNED BY user_api_keys.id;
+ALTER SEQUENCE public.user_api_keys_id_seq OWNED BY public.user_api_keys.id;
 
 
 --
--- Name: user_archived_messages; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_archived_messages; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_archived_messages (
+CREATE TABLE public.user_archived_messages (
     id integer NOT NULL,
     user_id integer NOT NULL,
     topic_id integer NOT NULL,
@@ -3995,7 +4073,8 @@ CREATE TABLE user_archived_messages (
 -- Name: user_archived_messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE user_archived_messages_id_seq
+CREATE SEQUENCE public.user_archived_messages_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4007,14 +4086,14 @@ CREATE SEQUENCE user_archived_messages_id_seq
 -- Name: user_archived_messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_archived_messages_id_seq OWNED BY user_archived_messages.id;
+ALTER SEQUENCE public.user_archived_messages_id_seq OWNED BY public.user_archived_messages.id;
 
 
 --
--- Name: user_auth_token_logs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_auth_token_logs; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_auth_token_logs (
+CREATE TABLE public.user_auth_token_logs (
     id integer NOT NULL,
     action character varying NOT NULL,
     user_auth_token_id integer,
@@ -4031,7 +4110,8 @@ CREATE TABLE user_auth_token_logs (
 -- Name: user_auth_token_logs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE user_auth_token_logs_id_seq
+CREATE SEQUENCE public.user_auth_token_logs_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4043,14 +4123,14 @@ CREATE SEQUENCE user_auth_token_logs_id_seq
 -- Name: user_auth_token_logs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_auth_token_logs_id_seq OWNED BY user_auth_token_logs.id;
+ALTER SEQUENCE public.user_auth_token_logs_id_seq OWNED BY public.user_auth_token_logs.id;
 
 
 --
--- Name: user_auth_tokens; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_auth_tokens; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_auth_tokens (
+CREATE TABLE public.user_auth_tokens (
     id integer NOT NULL,
     user_id integer NOT NULL,
     auth_token character varying NOT NULL,
@@ -4069,7 +4149,8 @@ CREATE TABLE user_auth_tokens (
 -- Name: user_auth_tokens_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE user_auth_tokens_id_seq
+CREATE SEQUENCE public.user_auth_tokens_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4081,14 +4162,14 @@ CREATE SEQUENCE user_auth_tokens_id_seq
 -- Name: user_auth_tokens_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_auth_tokens_id_seq OWNED BY user_auth_tokens.id;
+ALTER SEQUENCE public.user_auth_tokens_id_seq OWNED BY public.user_auth_tokens.id;
 
 
 --
--- Name: user_avatars; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_avatars; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_avatars (
+CREATE TABLE public.user_avatars (
     id integer NOT NULL,
     user_id integer NOT NULL,
     custom_upload_id integer,
@@ -4103,7 +4184,8 @@ CREATE TABLE user_avatars (
 -- Name: user_avatars_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE user_avatars_id_seq
+CREATE SEQUENCE public.user_avatars_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4115,14 +4197,14 @@ CREATE SEQUENCE user_avatars_id_seq
 -- Name: user_avatars_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_avatars_id_seq OWNED BY user_avatars.id;
+ALTER SEQUENCE public.user_avatars_id_seq OWNED BY public.user_avatars.id;
 
 
 --
--- Name: user_badges; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_badges; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_badges (
+CREATE TABLE public.user_badges (
     id integer NOT NULL,
     badge_id integer NOT NULL,
     user_id integer NOT NULL,
@@ -4138,7 +4220,8 @@ CREATE TABLE user_badges (
 -- Name: user_badges_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE user_badges_id_seq
+CREATE SEQUENCE public.user_badges_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4150,14 +4233,14 @@ CREATE SEQUENCE user_badges_id_seq
 -- Name: user_badges_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_badges_id_seq OWNED BY user_badges.id;
+ALTER SEQUENCE public.user_badges_id_seq OWNED BY public.user_badges.id;
 
 
 --
--- Name: user_custom_fields; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_custom_fields; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_custom_fields (
+CREATE TABLE public.user_custom_fields (
     id integer NOT NULL,
     user_id integer NOT NULL,
     name character varying(256) NOT NULL,
@@ -4171,7 +4254,8 @@ CREATE TABLE user_custom_fields (
 -- Name: user_custom_fields_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE user_custom_fields_id_seq
+CREATE SEQUENCE public.user_custom_fields_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4183,14 +4267,14 @@ CREATE SEQUENCE user_custom_fields_id_seq
 -- Name: user_custom_fields_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_custom_fields_id_seq OWNED BY user_custom_fields.id;
+ALTER SEQUENCE public.user_custom_fields_id_seq OWNED BY public.user_custom_fields.id;
 
 
 --
--- Name: user_emails; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_emails; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_emails (
+CREATE TABLE public.user_emails (
     id integer NOT NULL,
     user_id integer NOT NULL,
     email character varying(513) NOT NULL,
@@ -4204,7 +4288,8 @@ CREATE TABLE user_emails (
 -- Name: user_emails_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE user_emails_id_seq
+CREATE SEQUENCE public.user_emails_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4216,14 +4301,14 @@ CREATE SEQUENCE user_emails_id_seq
 -- Name: user_emails_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_emails_id_seq OWNED BY user_emails.id;
+ALTER SEQUENCE public.user_emails_id_seq OWNED BY public.user_emails.id;
 
 
 --
--- Name: user_exports; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_exports; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_exports (
+CREATE TABLE public.user_exports (
     id integer NOT NULL,
     file_name character varying NOT NULL,
     user_id integer NOT NULL,
@@ -4237,7 +4322,8 @@ CREATE TABLE user_exports (
 -- Name: user_exports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE user_exports_id_seq
+CREATE SEQUENCE public.user_exports_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4249,14 +4335,14 @@ CREATE SEQUENCE user_exports_id_seq
 -- Name: user_exports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_exports_id_seq OWNED BY user_exports.id;
+ALTER SEQUENCE public.user_exports_id_seq OWNED BY public.user_exports.id;
 
 
 --
--- Name: user_field_options; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_field_options; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_field_options (
+CREATE TABLE public.user_field_options (
     id integer NOT NULL,
     user_field_id integer NOT NULL,
     value character varying NOT NULL,
@@ -4269,7 +4355,8 @@ CREATE TABLE user_field_options (
 -- Name: user_field_options_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE user_field_options_id_seq
+CREATE SEQUENCE public.user_field_options_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4281,14 +4368,14 @@ CREATE SEQUENCE user_field_options_id_seq
 -- Name: user_field_options_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_field_options_id_seq OWNED BY user_field_options.id;
+ALTER SEQUENCE public.user_field_options_id_seq OWNED BY public.user_field_options.id;
 
 
 --
--- Name: user_fields; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_fields; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_fields (
+CREATE TABLE public.user_fields (
     id integer NOT NULL,
     name character varying NOT NULL,
     field_type character varying NOT NULL,
@@ -4309,7 +4396,8 @@ CREATE TABLE user_fields (
 -- Name: user_fields_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE user_fields_id_seq
+CREATE SEQUENCE public.user_fields_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4321,14 +4409,14 @@ CREATE SEQUENCE user_fields_id_seq
 -- Name: user_fields_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_fields_id_seq OWNED BY user_fields.id;
+ALTER SEQUENCE public.user_fields_id_seq OWNED BY public.user_fields.id;
 
 
 --
--- Name: user_histories; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_histories; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_histories (
+CREATE TABLE public.user_histories (
     id integer NOT NULL,
     action integer NOT NULL,
     acting_user_id integer,
@@ -4354,7 +4442,8 @@ CREATE TABLE user_histories (
 -- Name: user_histories_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE user_histories_id_seq
+CREATE SEQUENCE public.user_histories_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4366,14 +4455,14 @@ CREATE SEQUENCE user_histories_id_seq
 -- Name: user_histories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_histories_id_seq OWNED BY user_histories.id;
+ALTER SEQUENCE public.user_histories_id_seq OWNED BY public.user_histories.id;
 
 
 --
--- Name: user_open_ids; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_open_ids; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_open_ids (
+CREATE TABLE public.user_open_ids (
     id integer NOT NULL,
     user_id integer NOT NULL,
     email character varying NOT NULL,
@@ -4388,7 +4477,8 @@ CREATE TABLE user_open_ids (
 -- Name: user_open_ids_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE user_open_ids_id_seq
+CREATE SEQUENCE public.user_open_ids_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4400,14 +4490,14 @@ CREATE SEQUENCE user_open_ids_id_seq
 -- Name: user_open_ids_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_open_ids_id_seq OWNED BY user_open_ids.id;
+ALTER SEQUENCE public.user_open_ids_id_seq OWNED BY public.user_open_ids.id;
 
 
 --
--- Name: user_options; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_options; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_options (
+CREATE TABLE public.user_options (
     user_id integer NOT NULL,
     email_always boolean DEFAULT false NOT NULL,
     mailing_list_mode boolean DEFAULT false NOT NULL,
@@ -4438,10 +4528,10 @@ CREATE TABLE user_options (
 
 
 --
--- Name: user_profile_views; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_profile_views; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_profile_views (
+CREATE TABLE public.user_profile_views (
     id integer NOT NULL,
     user_profile_id integer NOT NULL,
     viewed_at timestamp without time zone NOT NULL,
@@ -4454,7 +4544,8 @@ CREATE TABLE user_profile_views (
 -- Name: user_profile_views_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE user_profile_views_id_seq
+CREATE SEQUENCE public.user_profile_views_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4466,14 +4557,14 @@ CREATE SEQUENCE user_profile_views_id_seq
 -- Name: user_profile_views_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_profile_views_id_seq OWNED BY user_profile_views.id;
+ALTER SEQUENCE public.user_profile_views_id_seq OWNED BY public.user_profile_views.id;
 
 
 --
--- Name: user_profiles; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_profiles; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_profiles (
+CREATE TABLE public.user_profiles (
     user_id integer NOT NULL,
     location character varying,
     website character varying,
@@ -4489,10 +4580,10 @@ CREATE TABLE user_profiles (
 
 
 --
--- Name: user_search_data; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_search_data; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_search_data (
+CREATE TABLE public.user_search_data (
     user_id integer NOT NULL,
     search_data tsvector,
     raw_data text,
@@ -4502,10 +4593,10 @@ CREATE TABLE user_search_data (
 
 
 --
--- Name: user_second_factors; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_second_factors; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_second_factors (
+CREATE TABLE public.user_second_factors (
     id bigint NOT NULL,
     user_id integer NOT NULL,
     method integer NOT NULL,
@@ -4521,7 +4612,7 @@ CREATE TABLE user_second_factors (
 -- Name: user_second_factors_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE user_second_factors_id_seq
+CREATE SEQUENCE public.user_second_factors_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4533,14 +4624,14 @@ CREATE SEQUENCE user_second_factors_id_seq
 -- Name: user_second_factors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_second_factors_id_seq OWNED BY user_second_factors.id;
+ALTER SEQUENCE public.user_second_factors_id_seq OWNED BY public.user_second_factors.id;
 
 
 --
--- Name: user_stats; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_stats; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_stats (
+CREATE TABLE public.user_stats (
     user_id integer NOT NULL,
     topics_entered integer DEFAULT 0 NOT NULL,
     time_read integer DEFAULT 0 NOT NULL,
@@ -4563,10 +4654,10 @@ CREATE TABLE user_stats (
 
 
 --
--- Name: user_uploads; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_uploads; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_uploads (
+CREATE TABLE public.user_uploads (
     id bigint NOT NULL,
     upload_id integer NOT NULL,
     user_id integer NOT NULL,
@@ -4578,7 +4669,7 @@ CREATE TABLE user_uploads (
 -- Name: user_uploads_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE user_uploads_id_seq
+CREATE SEQUENCE public.user_uploads_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4590,14 +4681,14 @@ CREATE SEQUENCE user_uploads_id_seq
 -- Name: user_uploads_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_uploads_id_seq OWNED BY user_uploads.id;
+ALTER SEQUENCE public.user_uploads_id_seq OWNED BY public.user_uploads.id;
 
 
 --
--- Name: user_visits; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_visits; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_visits (
+CREATE TABLE public.user_visits (
     id integer NOT NULL,
     user_id integer NOT NULL,
     visited_at date NOT NULL,
@@ -4611,7 +4702,8 @@ CREATE TABLE user_visits (
 -- Name: user_visits_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE user_visits_id_seq
+CREATE SEQUENCE public.user_visits_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4623,14 +4715,14 @@ CREATE SEQUENCE user_visits_id_seq
 -- Name: user_visits_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_visits_id_seq OWNED BY user_visits.id;
+ALTER SEQUENCE public.user_visits_id_seq OWNED BY public.user_visits.id;
 
 
 --
--- Name: user_warnings; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: user_warnings; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE user_warnings (
+CREATE TABLE public.user_warnings (
     id integer NOT NULL,
     topic_id integer NOT NULL,
     user_id integer NOT NULL,
@@ -4644,7 +4736,8 @@ CREATE TABLE user_warnings (
 -- Name: user_warnings_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE user_warnings_id_seq
+CREATE SEQUENCE public.user_warnings_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4656,14 +4749,14 @@ CREATE SEQUENCE user_warnings_id_seq
 -- Name: user_warnings_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE user_warnings_id_seq OWNED BY user_warnings.id;
+ALTER SEQUENCE public.user_warnings_id_seq OWNED BY public.user_warnings.id;
 
 
 --
--- Name: users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE users (
+CREATE TABLE public.users (
     id integer NOT NULL,
     username character varying(60) NOT NULL,
     created_at timestamp without time zone NOT NULL,
@@ -4707,7 +4800,8 @@ CREATE TABLE users (
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE users_id_seq
+CREATE SEQUENCE public.users_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4719,14 +4813,14 @@ CREATE SEQUENCE users_id_seq
 -- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE users_id_seq OWNED BY users.id;
+ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 
 --
--- Name: watched_words; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: watched_words; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE watched_words (
+CREATE TABLE public.watched_words (
     id integer NOT NULL,
     word character varying NOT NULL,
     action integer NOT NULL,
@@ -4739,7 +4833,8 @@ CREATE TABLE watched_words (
 -- Name: watched_words_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE watched_words_id_seq
+CREATE SEQUENCE public.watched_words_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4751,14 +4846,14 @@ CREATE SEQUENCE watched_words_id_seq
 -- Name: watched_words_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE watched_words_id_seq OWNED BY watched_words.id;
+ALTER SEQUENCE public.watched_words_id_seq OWNED BY public.watched_words.id;
 
 
 --
--- Name: web_crawler_requests; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: web_crawler_requests; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE web_crawler_requests (
+CREATE TABLE public.web_crawler_requests (
     id bigint NOT NULL,
     date date NOT NULL,
     user_agent character varying NOT NULL,
@@ -4770,7 +4865,7 @@ CREATE TABLE web_crawler_requests (
 -- Name: web_crawler_requests_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE web_crawler_requests_id_seq
+CREATE SEQUENCE public.web_crawler_requests_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4782,24 +4877,24 @@ CREATE SEQUENCE web_crawler_requests_id_seq
 -- Name: web_crawler_requests_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE web_crawler_requests_id_seq OWNED BY web_crawler_requests.id;
+ALTER SEQUENCE public.web_crawler_requests_id_seq OWNED BY public.web_crawler_requests.id;
 
 
 --
--- Name: web_hook_event_types; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: web_hook_event_types; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE web_hook_event_types (
+CREATE TABLE public.web_hook_event_types (
     id integer NOT NULL,
     name character varying NOT NULL
 );
 
 
 --
--- Name: web_hook_event_types_hooks; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: web_hook_event_types_hooks; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE web_hook_event_types_hooks (
+CREATE TABLE public.web_hook_event_types_hooks (
     web_hook_id integer NOT NULL,
     web_hook_event_type_id integer NOT NULL
 );
@@ -4809,7 +4904,8 @@ CREATE TABLE web_hook_event_types_hooks (
 -- Name: web_hook_event_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE web_hook_event_types_id_seq
+CREATE SEQUENCE public.web_hook_event_types_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4821,14 +4917,14 @@ CREATE SEQUENCE web_hook_event_types_id_seq
 -- Name: web_hook_event_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE web_hook_event_types_id_seq OWNED BY web_hook_event_types.id;
+ALTER SEQUENCE public.web_hook_event_types_id_seq OWNED BY public.web_hook_event_types.id;
 
 
 --
--- Name: web_hook_events; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: web_hook_events; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE web_hook_events (
+CREATE TABLE public.web_hook_events (
     id integer NOT NULL,
     web_hook_id integer NOT NULL,
     headers character varying,
@@ -4846,7 +4942,8 @@ CREATE TABLE web_hook_events (
 -- Name: web_hook_events_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE web_hook_events_id_seq
+CREATE SEQUENCE public.web_hook_events_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4858,14 +4955,14 @@ CREATE SEQUENCE web_hook_events_id_seq
 -- Name: web_hook_events_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE web_hook_events_id_seq OWNED BY web_hook_events.id;
+ALTER SEQUENCE public.web_hook_events_id_seq OWNED BY public.web_hook_events.id;
 
 
 --
--- Name: web_hooks; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: web_hooks; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE web_hooks (
+CREATE TABLE public.web_hooks (
     id integer NOT NULL,
     payload_url character varying NOT NULL,
     content_type integer DEFAULT 1 NOT NULL,
@@ -4884,7 +4981,8 @@ CREATE TABLE web_hooks (
 -- Name: web_hooks_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE web_hooks_id_seq
+CREATE SEQUENCE public.web_hooks_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4896,3839 +4994,3839 @@ CREATE SEQUENCE web_hooks_id_seq
 -- Name: web_hooks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE web_hooks_id_seq OWNED BY web_hooks.id;
+ALTER SEQUENCE public.web_hooks_id_seq OWNED BY public.web_hooks.id;
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: api_keys id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY api_keys ALTER COLUMN id SET DEFAULT nextval('api_keys_id_seq'::regclass);
+ALTER TABLE ONLY public.api_keys ALTER COLUMN id SET DEFAULT nextval('public.api_keys_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: application_requests id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY application_requests ALTER COLUMN id SET DEFAULT nextval('application_requests_id_seq'::regclass);
+ALTER TABLE ONLY public.application_requests ALTER COLUMN id SET DEFAULT nextval('public.application_requests_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: badge_groupings id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY badge_groupings ALTER COLUMN id SET DEFAULT nextval('badge_groupings_id_seq'::regclass);
+ALTER TABLE ONLY public.badge_groupings ALTER COLUMN id SET DEFAULT nextval('public.badge_groupings_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: badge_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY badge_types ALTER COLUMN id SET DEFAULT nextval('badge_types_id_seq'::regclass);
+ALTER TABLE ONLY public.badge_types ALTER COLUMN id SET DEFAULT nextval('public.badge_types_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: badges id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY badges ALTER COLUMN id SET DEFAULT nextval('badges_id_seq'::regclass);
+ALTER TABLE ONLY public.badges ALTER COLUMN id SET DEFAULT nextval('public.badges_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: categories id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY categories ALTER COLUMN id SET DEFAULT nextval('categories_id_seq'::regclass);
+ALTER TABLE ONLY public.categories ALTER COLUMN id SET DEFAULT nextval('public.categories_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: category_custom_fields id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY category_custom_fields ALTER COLUMN id SET DEFAULT nextval('category_custom_fields_id_seq'::regclass);
+ALTER TABLE ONLY public.category_custom_fields ALTER COLUMN id SET DEFAULT nextval('public.category_custom_fields_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: category_featured_topics id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY category_featured_topics ALTER COLUMN id SET DEFAULT nextval('category_featured_topics_id_seq'::regclass);
+ALTER TABLE ONLY public.category_featured_topics ALTER COLUMN id SET DEFAULT nextval('public.category_featured_topics_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: category_groups id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY category_groups ALTER COLUMN id SET DEFAULT nextval('category_groups_id_seq'::regclass);
+ALTER TABLE ONLY public.category_groups ALTER COLUMN id SET DEFAULT nextval('public.category_groups_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: category_tag_groups id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY category_tag_groups ALTER COLUMN id SET DEFAULT nextval('category_tag_groups_id_seq'::regclass);
+ALTER TABLE ONLY public.category_tag_groups ALTER COLUMN id SET DEFAULT nextval('public.category_tag_groups_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: category_tag_stats id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY category_tag_stats ALTER COLUMN id SET DEFAULT nextval('category_tag_stats_id_seq'::regclass);
+ALTER TABLE ONLY public.category_tag_stats ALTER COLUMN id SET DEFAULT nextval('public.category_tag_stats_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: category_tags id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY category_tags ALTER COLUMN id SET DEFAULT nextval('category_tags_id_seq'::regclass);
+ALTER TABLE ONLY public.category_tags ALTER COLUMN id SET DEFAULT nextval('public.category_tags_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: category_users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY category_users ALTER COLUMN id SET DEFAULT nextval('category_users_id_seq'::regclass);
+ALTER TABLE ONLY public.category_users ALTER COLUMN id SET DEFAULT nextval('public.category_users_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: child_themes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY child_themes ALTER COLUMN id SET DEFAULT nextval('child_themes_id_seq'::regclass);
+ALTER TABLE ONLY public.child_themes ALTER COLUMN id SET DEFAULT nextval('public.child_themes_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: color_scheme_colors id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY color_scheme_colors ALTER COLUMN id SET DEFAULT nextval('color_scheme_colors_id_seq'::regclass);
+ALTER TABLE ONLY public.color_scheme_colors ALTER COLUMN id SET DEFAULT nextval('public.color_scheme_colors_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: color_schemes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY color_schemes ALTER COLUMN id SET DEFAULT nextval('color_schemes_id_seq'::regclass);
+ALTER TABLE ONLY public.color_schemes ALTER COLUMN id SET DEFAULT nextval('public.color_schemes_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: custom_emojis id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY custom_emojis ALTER COLUMN id SET DEFAULT nextval('custom_emojis_id_seq'::regclass);
+ALTER TABLE ONLY public.custom_emojis ALTER COLUMN id SET DEFAULT nextval('public.custom_emojis_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: developers id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY developers ALTER COLUMN id SET DEFAULT nextval('developers_id_seq'::regclass);
+ALTER TABLE ONLY public.developers ALTER COLUMN id SET DEFAULT nextval('public.developers_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: directory_items id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY directory_items ALTER COLUMN id SET DEFAULT nextval('directory_items_id_seq'::regclass);
+ALTER TABLE ONLY public.directory_items ALTER COLUMN id SET DEFAULT nextval('public.directory_items_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: draft_sequences id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY draft_sequences ALTER COLUMN id SET DEFAULT nextval('draft_sequences_id_seq'::regclass);
+ALTER TABLE ONLY public.draft_sequences ALTER COLUMN id SET DEFAULT nextval('public.draft_sequences_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: drafts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY drafts ALTER COLUMN id SET DEFAULT nextval('drafts_id_seq'::regclass);
+ALTER TABLE ONLY public.drafts ALTER COLUMN id SET DEFAULT nextval('public.drafts_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: email_change_requests id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY email_change_requests ALTER COLUMN id SET DEFAULT nextval('email_change_requests_id_seq'::regclass);
+ALTER TABLE ONLY public.email_change_requests ALTER COLUMN id SET DEFAULT nextval('public.email_change_requests_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: email_logs id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY email_logs ALTER COLUMN id SET DEFAULT nextval('email_logs_id_seq'::regclass);
+ALTER TABLE ONLY public.email_logs ALTER COLUMN id SET DEFAULT nextval('public.email_logs_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: email_tokens id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY email_tokens ALTER COLUMN id SET DEFAULT nextval('email_tokens_id_seq'::regclass);
+ALTER TABLE ONLY public.email_tokens ALTER COLUMN id SET DEFAULT nextval('public.email_tokens_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: embeddable_hosts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY embeddable_hosts ALTER COLUMN id SET DEFAULT nextval('embeddable_hosts_id_seq'::regclass);
+ALTER TABLE ONLY public.embeddable_hosts ALTER COLUMN id SET DEFAULT nextval('public.embeddable_hosts_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: facebook_user_infos id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY facebook_user_infos ALTER COLUMN id SET DEFAULT nextval('facebook_user_infos_id_seq'::regclass);
+ALTER TABLE ONLY public.facebook_user_infos ALTER COLUMN id SET DEFAULT nextval('public.facebook_user_infos_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: github_user_infos id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY github_user_infos ALTER COLUMN id SET DEFAULT nextval('github_user_infos_id_seq'::regclass);
+ALTER TABLE ONLY public.github_user_infos ALTER COLUMN id SET DEFAULT nextval('public.github_user_infos_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: google_user_infos id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY google_user_infos ALTER COLUMN id SET DEFAULT nextval('google_user_infos_id_seq'::regclass);
+ALTER TABLE ONLY public.google_user_infos ALTER COLUMN id SET DEFAULT nextval('public.google_user_infos_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: group_archived_messages id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY group_archived_messages ALTER COLUMN id SET DEFAULT nextval('group_archived_messages_id_seq'::regclass);
+ALTER TABLE ONLY public.group_archived_messages ALTER COLUMN id SET DEFAULT nextval('public.group_archived_messages_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: group_custom_fields id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY group_custom_fields ALTER COLUMN id SET DEFAULT nextval('group_custom_fields_id_seq'::regclass);
+ALTER TABLE ONLY public.group_custom_fields ALTER COLUMN id SET DEFAULT nextval('public.group_custom_fields_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: group_histories id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY group_histories ALTER COLUMN id SET DEFAULT nextval('group_histories_id_seq'::regclass);
+ALTER TABLE ONLY public.group_histories ALTER COLUMN id SET DEFAULT nextval('public.group_histories_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: group_mentions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY group_mentions ALTER COLUMN id SET DEFAULT nextval('group_mentions_id_seq'::regclass);
+ALTER TABLE ONLY public.group_mentions ALTER COLUMN id SET DEFAULT nextval('public.group_mentions_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: group_users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY group_users ALTER COLUMN id SET DEFAULT nextval('group_users_id_seq'::regclass);
+ALTER TABLE ONLY public.group_users ALTER COLUMN id SET DEFAULT nextval('public.group_users_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: groups id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY groups ALTER COLUMN id SET DEFAULT nextval('groups_id_seq'::regclass);
+ALTER TABLE ONLY public.groups ALTER COLUMN id SET DEFAULT nextval('public.groups_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: incoming_domains id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY incoming_domains ALTER COLUMN id SET DEFAULT nextval('incoming_domains_id_seq'::regclass);
+ALTER TABLE ONLY public.incoming_domains ALTER COLUMN id SET DEFAULT nextval('public.incoming_domains_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: incoming_emails id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY incoming_emails ALTER COLUMN id SET DEFAULT nextval('incoming_emails_id_seq'::regclass);
+ALTER TABLE ONLY public.incoming_emails ALTER COLUMN id SET DEFAULT nextval('public.incoming_emails_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: incoming_links id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY incoming_links ALTER COLUMN id SET DEFAULT nextval('incoming_links_id_seq'::regclass);
+ALTER TABLE ONLY public.incoming_links ALTER COLUMN id SET DEFAULT nextval('public.incoming_links_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: incoming_referers id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY incoming_referers ALTER COLUMN id SET DEFAULT nextval('incoming_referers_id_seq'::regclass);
+ALTER TABLE ONLY public.incoming_referers ALTER COLUMN id SET DEFAULT nextval('public.incoming_referers_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: instagram_user_infos id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY instagram_user_infos ALTER COLUMN id SET DEFAULT nextval('instagram_user_infos_id_seq'::regclass);
+ALTER TABLE ONLY public.instagram_user_infos ALTER COLUMN id SET DEFAULT nextval('public.instagram_user_infos_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: invited_groups id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY invited_groups ALTER COLUMN id SET DEFAULT nextval('invited_groups_id_seq'::regclass);
+ALTER TABLE ONLY public.invited_groups ALTER COLUMN id SET DEFAULT nextval('public.invited_groups_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: invites id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY invites ALTER COLUMN id SET DEFAULT nextval('invites_id_seq'::regclass);
+ALTER TABLE ONLY public.invites ALTER COLUMN id SET DEFAULT nextval('public.invites_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: javascript_caches id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY javascript_caches ALTER COLUMN id SET DEFAULT nextval('javascript_caches_id_seq'::regclass);
+ALTER TABLE ONLY public.javascript_caches ALTER COLUMN id SET DEFAULT nextval('public.javascript_caches_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: message_bus id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY message_bus ALTER COLUMN id SET DEFAULT nextval('message_bus_id_seq'::regclass);
+ALTER TABLE ONLY public.message_bus ALTER COLUMN id SET DEFAULT nextval('public.message_bus_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: muted_users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY muted_users ALTER COLUMN id SET DEFAULT nextval('muted_users_id_seq'::regclass);
+ALTER TABLE ONLY public.muted_users ALTER COLUMN id SET DEFAULT nextval('public.muted_users_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: notifications id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY notifications ALTER COLUMN id SET DEFAULT nextval('notifications_id_seq'::regclass);
+ALTER TABLE ONLY public.notifications ALTER COLUMN id SET DEFAULT nextval('public.notifications_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: oauth2_user_infos id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY oauth2_user_infos ALTER COLUMN id SET DEFAULT nextval('oauth2_user_infos_id_seq'::regclass);
+ALTER TABLE ONLY public.oauth2_user_infos ALTER COLUMN id SET DEFAULT nextval('public.oauth2_user_infos_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: onceoff_logs id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY onceoff_logs ALTER COLUMN id SET DEFAULT nextval('onceoff_logs_id_seq'::regclass);
+ALTER TABLE ONLY public.onceoff_logs ALTER COLUMN id SET DEFAULT nextval('public.onceoff_logs_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: optimized_images id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY optimized_images ALTER COLUMN id SET DEFAULT nextval('optimized_images_id_seq'::regclass);
+ALTER TABLE ONLY public.optimized_images ALTER COLUMN id SET DEFAULT nextval('public.optimized_images_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: permalinks id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY permalinks ALTER COLUMN id SET DEFAULT nextval('permalinks_id_seq'::regclass);
+ALTER TABLE ONLY public.permalinks ALTER COLUMN id SET DEFAULT nextval('public.permalinks_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: plugin_store_rows id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY plugin_store_rows ALTER COLUMN id SET DEFAULT nextval('plugin_store_rows_id_seq'::regclass);
+ALTER TABLE ONLY public.plugin_store_rows ALTER COLUMN id SET DEFAULT nextval('public.plugin_store_rows_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: post_action_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY post_action_types ALTER COLUMN id SET DEFAULT nextval('post_action_types_id_seq'::regclass);
+ALTER TABLE ONLY public.post_action_types ALTER COLUMN id SET DEFAULT nextval('public.post_action_types_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: post_actions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY post_actions ALTER COLUMN id SET DEFAULT nextval('post_actions_id_seq'::regclass);
+ALTER TABLE ONLY public.post_actions ALTER COLUMN id SET DEFAULT nextval('public.post_actions_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: post_custom_fields id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY post_custom_fields ALTER COLUMN id SET DEFAULT nextval('post_custom_fields_id_seq'::regclass);
+ALTER TABLE ONLY public.post_custom_fields ALTER COLUMN id SET DEFAULT nextval('public.post_custom_fields_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: post_details id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY post_details ALTER COLUMN id SET DEFAULT nextval('post_details_id_seq'::regclass);
+ALTER TABLE ONLY public.post_details ALTER COLUMN id SET DEFAULT nextval('public.post_details_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: post_reply_keys id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY post_reply_keys ALTER COLUMN id SET DEFAULT nextval('post_reply_keys_id_seq'::regclass);
+ALTER TABLE ONLY public.post_reply_keys ALTER COLUMN id SET DEFAULT nextval('public.post_reply_keys_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: post_revisions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY post_revisions ALTER COLUMN id SET DEFAULT nextval('post_revisions_id_seq'::regclass);
+ALTER TABLE ONLY public.post_revisions ALTER COLUMN id SET DEFAULT nextval('public.post_revisions_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: post_stats id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY post_stats ALTER COLUMN id SET DEFAULT nextval('post_stats_id_seq'::regclass);
+ALTER TABLE ONLY public.post_stats ALTER COLUMN id SET DEFAULT nextval('public.post_stats_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: post_uploads id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY post_uploads ALTER COLUMN id SET DEFAULT nextval('post_uploads_id_seq'::regclass);
+ALTER TABLE ONLY public.post_uploads ALTER COLUMN id SET DEFAULT nextval('public.post_uploads_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: posts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY posts ALTER COLUMN id SET DEFAULT nextval('posts_id_seq'::regclass);
+ALTER TABLE ONLY public.posts ALTER COLUMN id SET DEFAULT nextval('public.posts_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: push_subscriptions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY push_subscriptions ALTER COLUMN id SET DEFAULT nextval('push_subscriptions_id_seq'::regclass);
+ALTER TABLE ONLY public.push_subscriptions ALTER COLUMN id SET DEFAULT nextval('public.push_subscriptions_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: queued_posts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY queued_posts ALTER COLUMN id SET DEFAULT nextval('queued_posts_id_seq'::regclass);
+ALTER TABLE ONLY public.queued_posts ALTER COLUMN id SET DEFAULT nextval('public.queued_posts_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: quoted_posts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY quoted_posts ALTER COLUMN id SET DEFAULT nextval('quoted_posts_id_seq'::regclass);
+ALTER TABLE ONLY public.quoted_posts ALTER COLUMN id SET DEFAULT nextval('public.quoted_posts_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: remote_themes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY remote_themes ALTER COLUMN id SET DEFAULT nextval('remote_themes_id_seq'::regclass);
+ALTER TABLE ONLY public.remote_themes ALTER COLUMN id SET DEFAULT nextval('public.remote_themes_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: scheduler_stats id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY scheduler_stats ALTER COLUMN id SET DEFAULT nextval('scheduler_stats_id_seq'::regclass);
+ALTER TABLE ONLY public.scheduler_stats ALTER COLUMN id SET DEFAULT nextval('public.scheduler_stats_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: schema_migration_details id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY schema_migration_details ALTER COLUMN id SET DEFAULT nextval('schema_migration_details_id_seq'::regclass);
+ALTER TABLE ONLY public.schema_migration_details ALTER COLUMN id SET DEFAULT nextval('public.schema_migration_details_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: screened_emails id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY screened_emails ALTER COLUMN id SET DEFAULT nextval('screened_emails_id_seq'::regclass);
+ALTER TABLE ONLY public.screened_emails ALTER COLUMN id SET DEFAULT nextval('public.screened_emails_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: screened_ip_addresses id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY screened_ip_addresses ALTER COLUMN id SET DEFAULT nextval('screened_ip_addresses_id_seq'::regclass);
+ALTER TABLE ONLY public.screened_ip_addresses ALTER COLUMN id SET DEFAULT nextval('public.screened_ip_addresses_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: screened_urls id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY screened_urls ALTER COLUMN id SET DEFAULT nextval('screened_urls_id_seq'::regclass);
+ALTER TABLE ONLY public.screened_urls ALTER COLUMN id SET DEFAULT nextval('public.screened_urls_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: search_logs id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY search_logs ALTER COLUMN id SET DEFAULT nextval('search_logs_id_seq'::regclass);
+ALTER TABLE ONLY public.search_logs ALTER COLUMN id SET DEFAULT nextval('public.search_logs_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: shared_drafts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY shared_drafts ALTER COLUMN id SET DEFAULT nextval('shared_drafts_id_seq'::regclass);
+ALTER TABLE ONLY public.shared_drafts ALTER COLUMN id SET DEFAULT nextval('public.shared_drafts_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: single_sign_on_records id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY single_sign_on_records ALTER COLUMN id SET DEFAULT nextval('single_sign_on_records_id_seq'::regclass);
+ALTER TABLE ONLY public.single_sign_on_records ALTER COLUMN id SET DEFAULT nextval('public.single_sign_on_records_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: site_settings id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY site_settings ALTER COLUMN id SET DEFAULT nextval('site_settings_id_seq'::regclass);
+ALTER TABLE ONLY public.site_settings ALTER COLUMN id SET DEFAULT nextval('public.site_settings_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: skipped_email_logs id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY skipped_email_logs ALTER COLUMN id SET DEFAULT nextval('skipped_email_logs_id_seq'::regclass);
+ALTER TABLE ONLY public.skipped_email_logs ALTER COLUMN id SET DEFAULT nextval('public.skipped_email_logs_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: stylesheet_cache id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY stylesheet_cache ALTER COLUMN id SET DEFAULT nextval('stylesheet_cache_id_seq'::regclass);
+ALTER TABLE ONLY public.stylesheet_cache ALTER COLUMN id SET DEFAULT nextval('public.stylesheet_cache_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: tag_group_memberships id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY tag_group_memberships ALTER COLUMN id SET DEFAULT nextval('tag_group_memberships_id_seq'::regclass);
+ALTER TABLE ONLY public.tag_group_memberships ALTER COLUMN id SET DEFAULT nextval('public.tag_group_memberships_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: tag_group_permissions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY tag_group_permissions ALTER COLUMN id SET DEFAULT nextval('tag_group_permissions_id_seq'::regclass);
+ALTER TABLE ONLY public.tag_group_permissions ALTER COLUMN id SET DEFAULT nextval('public.tag_group_permissions_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: tag_groups id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY tag_groups ALTER COLUMN id SET DEFAULT nextval('tag_groups_id_seq'::regclass);
+ALTER TABLE ONLY public.tag_groups ALTER COLUMN id SET DEFAULT nextval('public.tag_groups_id_seq'::regclass);
 
 
 --
--- Name: tag_id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: tag_search_data tag_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY tag_search_data ALTER COLUMN tag_id SET DEFAULT nextval('tag_search_data_tag_id_seq'::regclass);
+ALTER TABLE ONLY public.tag_search_data ALTER COLUMN tag_id SET DEFAULT nextval('public.tag_search_data_tag_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: tag_users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY tag_users ALTER COLUMN id SET DEFAULT nextval('tag_users_id_seq'::regclass);
+ALTER TABLE ONLY public.tag_users ALTER COLUMN id SET DEFAULT nextval('public.tag_users_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: tags id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY tags ALTER COLUMN id SET DEFAULT nextval('tags_id_seq'::regclass);
+ALTER TABLE ONLY public.tags ALTER COLUMN id SET DEFAULT nextval('public.tags_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: theme_fields id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY theme_fields ALTER COLUMN id SET DEFAULT nextval('theme_fields_id_seq'::regclass);
+ALTER TABLE ONLY public.theme_fields ALTER COLUMN id SET DEFAULT nextval('public.theme_fields_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: theme_settings id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY theme_settings ALTER COLUMN id SET DEFAULT nextval('theme_settings_id_seq'::regclass);
+ALTER TABLE ONLY public.theme_settings ALTER COLUMN id SET DEFAULT nextval('public.theme_settings_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: themes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY themes ALTER COLUMN id SET DEFAULT nextval('themes_id_seq'::regclass);
+ALTER TABLE ONLY public.themes ALTER COLUMN id SET DEFAULT nextval('public.themes_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: top_topics id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY top_topics ALTER COLUMN id SET DEFAULT nextval('top_topics_id_seq'::regclass);
+ALTER TABLE ONLY public.top_topics ALTER COLUMN id SET DEFAULT nextval('public.top_topics_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: topic_allowed_groups id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_allowed_groups ALTER COLUMN id SET DEFAULT nextval('topic_allowed_groups_id_seq'::regclass);
+ALTER TABLE ONLY public.topic_allowed_groups ALTER COLUMN id SET DEFAULT nextval('public.topic_allowed_groups_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: topic_allowed_users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_allowed_users ALTER COLUMN id SET DEFAULT nextval('topic_allowed_users_id_seq'::regclass);
+ALTER TABLE ONLY public.topic_allowed_users ALTER COLUMN id SET DEFAULT nextval('public.topic_allowed_users_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: topic_custom_fields id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_custom_fields ALTER COLUMN id SET DEFAULT nextval('topic_custom_fields_id_seq'::regclass);
+ALTER TABLE ONLY public.topic_custom_fields ALTER COLUMN id SET DEFAULT nextval('public.topic_custom_fields_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: topic_embeds id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_embeds ALTER COLUMN id SET DEFAULT nextval('topic_embeds_id_seq'::regclass);
+ALTER TABLE ONLY public.topic_embeds ALTER COLUMN id SET DEFAULT nextval('public.topic_embeds_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: topic_invites id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_invites ALTER COLUMN id SET DEFAULT nextval('topic_invites_id_seq'::regclass);
+ALTER TABLE ONLY public.topic_invites ALTER COLUMN id SET DEFAULT nextval('public.topic_invites_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: topic_link_clicks id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_link_clicks ALTER COLUMN id SET DEFAULT nextval('topic_link_clicks_id_seq'::regclass);
+ALTER TABLE ONLY public.topic_link_clicks ALTER COLUMN id SET DEFAULT nextval('public.topic_link_clicks_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: topic_links id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_links ALTER COLUMN id SET DEFAULT nextval('topic_links_id_seq'::regclass);
+ALTER TABLE ONLY public.topic_links ALTER COLUMN id SET DEFAULT nextval('public.topic_links_id_seq'::regclass);
 
 
 --
--- Name: topic_id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: topic_search_data topic_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_search_data ALTER COLUMN topic_id SET DEFAULT nextval('topic_search_data_topic_id_seq'::regclass);
+ALTER TABLE ONLY public.topic_search_data ALTER COLUMN topic_id SET DEFAULT nextval('public.topic_search_data_topic_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: topic_tags id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_tags ALTER COLUMN id SET DEFAULT nextval('topic_tags_id_seq'::regclass);
+ALTER TABLE ONLY public.topic_tags ALTER COLUMN id SET DEFAULT nextval('public.topic_tags_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: topic_timers id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_timers ALTER COLUMN id SET DEFAULT nextval('topic_timers_id_seq'::regclass);
+ALTER TABLE ONLY public.topic_timers ALTER COLUMN id SET DEFAULT nextval('public.topic_timers_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: topic_users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_users ALTER COLUMN id SET DEFAULT nextval('topic_users_id_seq'::regclass);
+ALTER TABLE ONLY public.topic_users ALTER COLUMN id SET DEFAULT nextval('public.topic_users_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: topics id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topics ALTER COLUMN id SET DEFAULT nextval('topics_id_seq'::regclass);
+ALTER TABLE ONLY public.topics ALTER COLUMN id SET DEFAULT nextval('public.topics_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: translation_overrides id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY translation_overrides ALTER COLUMN id SET DEFAULT nextval('translation_overrides_id_seq'::regclass);
+ALTER TABLE ONLY public.translation_overrides ALTER COLUMN id SET DEFAULT nextval('public.translation_overrides_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: twitter_user_infos id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY twitter_user_infos ALTER COLUMN id SET DEFAULT nextval('twitter_user_infos_id_seq'::regclass);
+ALTER TABLE ONLY public.twitter_user_infos ALTER COLUMN id SET DEFAULT nextval('public.twitter_user_infos_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: uploads id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY uploads ALTER COLUMN id SET DEFAULT nextval('uploads_id_seq'::regclass);
+ALTER TABLE ONLY public.uploads ALTER COLUMN id SET DEFAULT nextval('public.uploads_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_actions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_actions ALTER COLUMN id SET DEFAULT nextval('user_actions_id_seq'::regclass);
+ALTER TABLE ONLY public.user_actions ALTER COLUMN id SET DEFAULT nextval('public.user_actions_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_api_keys id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_api_keys ALTER COLUMN id SET DEFAULT nextval('user_api_keys_id_seq'::regclass);
+ALTER TABLE ONLY public.user_api_keys ALTER COLUMN id SET DEFAULT nextval('public.user_api_keys_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_archived_messages id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_archived_messages ALTER COLUMN id SET DEFAULT nextval('user_archived_messages_id_seq'::regclass);
+ALTER TABLE ONLY public.user_archived_messages ALTER COLUMN id SET DEFAULT nextval('public.user_archived_messages_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_auth_token_logs id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_auth_token_logs ALTER COLUMN id SET DEFAULT nextval('user_auth_token_logs_id_seq'::regclass);
+ALTER TABLE ONLY public.user_auth_token_logs ALTER COLUMN id SET DEFAULT nextval('public.user_auth_token_logs_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_auth_tokens id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_auth_tokens ALTER COLUMN id SET DEFAULT nextval('user_auth_tokens_id_seq'::regclass);
+ALTER TABLE ONLY public.user_auth_tokens ALTER COLUMN id SET DEFAULT nextval('public.user_auth_tokens_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_avatars id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_avatars ALTER COLUMN id SET DEFAULT nextval('user_avatars_id_seq'::regclass);
+ALTER TABLE ONLY public.user_avatars ALTER COLUMN id SET DEFAULT nextval('public.user_avatars_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_badges id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_badges ALTER COLUMN id SET DEFAULT nextval('user_badges_id_seq'::regclass);
+ALTER TABLE ONLY public.user_badges ALTER COLUMN id SET DEFAULT nextval('public.user_badges_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_custom_fields id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_custom_fields ALTER COLUMN id SET DEFAULT nextval('user_custom_fields_id_seq'::regclass);
+ALTER TABLE ONLY public.user_custom_fields ALTER COLUMN id SET DEFAULT nextval('public.user_custom_fields_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_emails id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_emails ALTER COLUMN id SET DEFAULT nextval('user_emails_id_seq'::regclass);
+ALTER TABLE ONLY public.user_emails ALTER COLUMN id SET DEFAULT nextval('public.user_emails_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_exports id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_exports ALTER COLUMN id SET DEFAULT nextval('user_exports_id_seq'::regclass);
+ALTER TABLE ONLY public.user_exports ALTER COLUMN id SET DEFAULT nextval('public.user_exports_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_field_options id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_field_options ALTER COLUMN id SET DEFAULT nextval('user_field_options_id_seq'::regclass);
+ALTER TABLE ONLY public.user_field_options ALTER COLUMN id SET DEFAULT nextval('public.user_field_options_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_fields id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_fields ALTER COLUMN id SET DEFAULT nextval('user_fields_id_seq'::regclass);
+ALTER TABLE ONLY public.user_fields ALTER COLUMN id SET DEFAULT nextval('public.user_fields_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_histories id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_histories ALTER COLUMN id SET DEFAULT nextval('user_histories_id_seq'::regclass);
+ALTER TABLE ONLY public.user_histories ALTER COLUMN id SET DEFAULT nextval('public.user_histories_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_open_ids id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_open_ids ALTER COLUMN id SET DEFAULT nextval('user_open_ids_id_seq'::regclass);
+ALTER TABLE ONLY public.user_open_ids ALTER COLUMN id SET DEFAULT nextval('public.user_open_ids_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_profile_views id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_profile_views ALTER COLUMN id SET DEFAULT nextval('user_profile_views_id_seq'::regclass);
+ALTER TABLE ONLY public.user_profile_views ALTER COLUMN id SET DEFAULT nextval('public.user_profile_views_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_second_factors id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_second_factors ALTER COLUMN id SET DEFAULT nextval('user_second_factors_id_seq'::regclass);
+ALTER TABLE ONLY public.user_second_factors ALTER COLUMN id SET DEFAULT nextval('public.user_second_factors_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_uploads id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_uploads ALTER COLUMN id SET DEFAULT nextval('user_uploads_id_seq'::regclass);
+ALTER TABLE ONLY public.user_uploads ALTER COLUMN id SET DEFAULT nextval('public.user_uploads_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_visits id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_visits ALTER COLUMN id SET DEFAULT nextval('user_visits_id_seq'::regclass);
+ALTER TABLE ONLY public.user_visits ALTER COLUMN id SET DEFAULT nextval('public.user_visits_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: user_warnings id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_warnings ALTER COLUMN id SET DEFAULT nextval('user_warnings_id_seq'::regclass);
+ALTER TABLE ONLY public.user_warnings ALTER COLUMN id SET DEFAULT nextval('public.user_warnings_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
+ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: watched_words id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY watched_words ALTER COLUMN id SET DEFAULT nextval('watched_words_id_seq'::regclass);
+ALTER TABLE ONLY public.watched_words ALTER COLUMN id SET DEFAULT nextval('public.watched_words_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: web_crawler_requests id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY web_crawler_requests ALTER COLUMN id SET DEFAULT nextval('web_crawler_requests_id_seq'::regclass);
+ALTER TABLE ONLY public.web_crawler_requests ALTER COLUMN id SET DEFAULT nextval('public.web_crawler_requests_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: web_hook_event_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY web_hook_event_types ALTER COLUMN id SET DEFAULT nextval('web_hook_event_types_id_seq'::regclass);
+ALTER TABLE ONLY public.web_hook_event_types ALTER COLUMN id SET DEFAULT nextval('public.web_hook_event_types_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: web_hook_events id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY web_hook_events ALTER COLUMN id SET DEFAULT nextval('web_hook_events_id_seq'::regclass);
+ALTER TABLE ONLY public.web_hook_events ALTER COLUMN id SET DEFAULT nextval('public.web_hook_events_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: web_hooks id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY web_hooks ALTER COLUMN id SET DEFAULT nextval('web_hooks_id_seq'::regclass);
+ALTER TABLE ONLY public.web_hooks ALTER COLUMN id SET DEFAULT nextval('public.web_hooks_id_seq'::regclass);
 
 
 --
--- Name: api_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: api_keys api_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY api_keys
+ALTER TABLE ONLY public.api_keys
     ADD CONSTRAINT api_keys_pkey PRIMARY KEY (id);
 
 
 --
--- Name: application_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: application_requests application_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY application_requests
+ALTER TABLE ONLY public.application_requests
     ADD CONSTRAINT application_requests_pkey PRIMARY KEY (id);
 
 
 --
--- Name: ar_internal_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: ar_internal_metadata ar_internal_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY ar_internal_metadata
+ALTER TABLE ONLY public.ar_internal_metadata
     ADD CONSTRAINT ar_internal_metadata_pkey PRIMARY KEY (key);
 
 
 --
--- Name: badge_groupings_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: badge_groupings badge_groupings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY badge_groupings
+ALTER TABLE ONLY public.badge_groupings
     ADD CONSTRAINT badge_groupings_pkey PRIMARY KEY (id);
 
 
 --
--- Name: badge_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: badge_types badge_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY badge_types
+ALTER TABLE ONLY public.badge_types
     ADD CONSTRAINT badge_types_pkey PRIMARY KEY (id);
 
 
 --
--- Name: badges_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: badges badges_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY badges
+ALTER TABLE ONLY public.badges
     ADD CONSTRAINT badges_pkey PRIMARY KEY (id);
 
 
 --
--- Name: categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: categories categories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY categories
+ALTER TABLE ONLY public.categories
     ADD CONSTRAINT categories_pkey PRIMARY KEY (id);
 
 
 --
--- Name: categories_search_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: category_search_data categories_search_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY category_search_data
+ALTER TABLE ONLY public.category_search_data
     ADD CONSTRAINT categories_search_pkey PRIMARY KEY (category_id);
 
 
 --
--- Name: category_custom_fields_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: category_custom_fields category_custom_fields_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY category_custom_fields
+ALTER TABLE ONLY public.category_custom_fields
     ADD CONSTRAINT category_custom_fields_pkey PRIMARY KEY (id);
 
 
 --
--- Name: category_featured_topics_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: category_featured_topics category_featured_topics_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY category_featured_topics
+ALTER TABLE ONLY public.category_featured_topics
     ADD CONSTRAINT category_featured_topics_pkey PRIMARY KEY (id);
 
 
 --
--- Name: category_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: category_groups category_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY category_groups
+ALTER TABLE ONLY public.category_groups
     ADD CONSTRAINT category_groups_pkey PRIMARY KEY (id);
 
 
 --
--- Name: category_tag_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: category_tag_groups category_tag_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY category_tag_groups
+ALTER TABLE ONLY public.category_tag_groups
     ADD CONSTRAINT category_tag_groups_pkey PRIMARY KEY (id);
 
 
 --
--- Name: category_tag_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: category_tag_stats category_tag_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY category_tag_stats
+ALTER TABLE ONLY public.category_tag_stats
     ADD CONSTRAINT category_tag_stats_pkey PRIMARY KEY (id);
 
 
 --
--- Name: category_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: category_tags category_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY category_tags
+ALTER TABLE ONLY public.category_tags
     ADD CONSTRAINT category_tags_pkey PRIMARY KEY (id);
 
 
 --
--- Name: category_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: category_users category_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY category_users
+ALTER TABLE ONLY public.category_users
     ADD CONSTRAINT category_users_pkey PRIMARY KEY (id);
 
 
 --
--- Name: child_themes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: child_themes child_themes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY child_themes
+ALTER TABLE ONLY public.child_themes
     ADD CONSTRAINT child_themes_pkey PRIMARY KEY (id);
 
 
 --
--- Name: color_scheme_colors_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: color_scheme_colors color_scheme_colors_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY color_scheme_colors
+ALTER TABLE ONLY public.color_scheme_colors
     ADD CONSTRAINT color_scheme_colors_pkey PRIMARY KEY (id);
 
 
 --
--- Name: color_schemes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: color_schemes color_schemes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY color_schemes
+ALTER TABLE ONLY public.color_schemes
     ADD CONSTRAINT color_schemes_pkey PRIMARY KEY (id);
 
 
 --
--- Name: custom_emojis_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: custom_emojis custom_emojis_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY custom_emojis
+ALTER TABLE ONLY public.custom_emojis
     ADD CONSTRAINT custom_emojis_pkey PRIMARY KEY (id);
 
 
 --
--- Name: developers_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: developers developers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY developers
+ALTER TABLE ONLY public.developers
     ADD CONSTRAINT developers_pkey PRIMARY KEY (id);
 
 
 --
--- Name: digest_unsubscribe_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: unsubscribe_keys digest_unsubscribe_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY unsubscribe_keys
+ALTER TABLE ONLY public.unsubscribe_keys
     ADD CONSTRAINT digest_unsubscribe_keys_pkey PRIMARY KEY (key);
 
 
 --
--- Name: directory_items_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: directory_items directory_items_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY directory_items
+ALTER TABLE ONLY public.directory_items
     ADD CONSTRAINT directory_items_pkey PRIMARY KEY (id);
 
 
 --
--- Name: draft_sequences_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: draft_sequences draft_sequences_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY draft_sequences
+ALTER TABLE ONLY public.draft_sequences
     ADD CONSTRAINT draft_sequences_pkey PRIMARY KEY (id);
 
 
 --
--- Name: drafts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: drafts drafts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY drafts
+ALTER TABLE ONLY public.drafts
     ADD CONSTRAINT drafts_pkey PRIMARY KEY (id);
 
 
 --
--- Name: email_change_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: email_change_requests email_change_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY email_change_requests
+ALTER TABLE ONLY public.email_change_requests
     ADD CONSTRAINT email_change_requests_pkey PRIMARY KEY (id);
 
 
 --
--- Name: email_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: email_logs email_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY email_logs
+ALTER TABLE ONLY public.email_logs
     ADD CONSTRAINT email_logs_pkey PRIMARY KEY (id);
 
 
 --
--- Name: email_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: email_tokens email_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY email_tokens
+ALTER TABLE ONLY public.email_tokens
     ADD CONSTRAINT email_tokens_pkey PRIMARY KEY (id);
 
 
 --
--- Name: embeddable_hosts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: embeddable_hosts embeddable_hosts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY embeddable_hosts
+ALTER TABLE ONLY public.embeddable_hosts
     ADD CONSTRAINT embeddable_hosts_pkey PRIMARY KEY (id);
 
 
 --
--- Name: facebook_user_infos_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: facebook_user_infos facebook_user_infos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY facebook_user_infos
+ALTER TABLE ONLY public.facebook_user_infos
     ADD CONSTRAINT facebook_user_infos_pkey PRIMARY KEY (id);
 
 
 --
--- Name: github_user_infos_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: github_user_infos github_user_infos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY github_user_infos
+ALTER TABLE ONLY public.github_user_infos
     ADD CONSTRAINT github_user_infos_pkey PRIMARY KEY (id);
 
 
 --
--- Name: google_user_infos_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: google_user_infos google_user_infos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY google_user_infos
+ALTER TABLE ONLY public.google_user_infos
     ADD CONSTRAINT google_user_infos_pkey PRIMARY KEY (id);
 
 
 --
--- Name: group_archived_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: group_archived_messages group_archived_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY group_archived_messages
+ALTER TABLE ONLY public.group_archived_messages
     ADD CONSTRAINT group_archived_messages_pkey PRIMARY KEY (id);
 
 
 --
--- Name: group_custom_fields_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: group_custom_fields group_custom_fields_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY group_custom_fields
+ALTER TABLE ONLY public.group_custom_fields
     ADD CONSTRAINT group_custom_fields_pkey PRIMARY KEY (id);
 
 
 --
--- Name: group_histories_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: group_histories group_histories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY group_histories
+ALTER TABLE ONLY public.group_histories
     ADD CONSTRAINT group_histories_pkey PRIMARY KEY (id);
 
 
 --
--- Name: group_mentions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: group_mentions group_mentions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY group_mentions
+ALTER TABLE ONLY public.group_mentions
     ADD CONSTRAINT group_mentions_pkey PRIMARY KEY (id);
 
 
 --
--- Name: group_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: group_users group_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY group_users
+ALTER TABLE ONLY public.group_users
     ADD CONSTRAINT group_users_pkey PRIMARY KEY (id);
 
 
 --
--- Name: groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: groups groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY groups
+ALTER TABLE ONLY public.groups
     ADD CONSTRAINT groups_pkey PRIMARY KEY (id);
 
 
 --
--- Name: incoming_domains_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: incoming_domains incoming_domains_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY incoming_domains
+ALTER TABLE ONLY public.incoming_domains
     ADD CONSTRAINT incoming_domains_pkey PRIMARY KEY (id);
 
 
 --
--- Name: incoming_emails_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: incoming_emails incoming_emails_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY incoming_emails
+ALTER TABLE ONLY public.incoming_emails
     ADD CONSTRAINT incoming_emails_pkey PRIMARY KEY (id);
 
 
 --
--- Name: incoming_links_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: incoming_links incoming_links_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY incoming_links
+ALTER TABLE ONLY public.incoming_links
     ADD CONSTRAINT incoming_links_pkey PRIMARY KEY (id);
 
 
 --
--- Name: incoming_referers_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: incoming_referers incoming_referers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY incoming_referers
+ALTER TABLE ONLY public.incoming_referers
     ADD CONSTRAINT incoming_referers_pkey PRIMARY KEY (id);
 
 
 --
--- Name: instagram_user_infos_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: instagram_user_infos instagram_user_infos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY instagram_user_infos
+ALTER TABLE ONLY public.instagram_user_infos
     ADD CONSTRAINT instagram_user_infos_pkey PRIMARY KEY (id);
 
 
 --
--- Name: invited_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: invited_groups invited_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY invited_groups
+ALTER TABLE ONLY public.invited_groups
     ADD CONSTRAINT invited_groups_pkey PRIMARY KEY (id);
 
 
 --
--- Name: invites_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: invites invites_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY invites
+ALTER TABLE ONLY public.invites
     ADD CONSTRAINT invites_pkey PRIMARY KEY (id);
 
 
 --
--- Name: javascript_caches_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: javascript_caches javascript_caches_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY javascript_caches
+ALTER TABLE ONLY public.javascript_caches
     ADD CONSTRAINT javascript_caches_pkey PRIMARY KEY (id);
 
 
 --
--- Name: message_bus_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: message_bus message_bus_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY message_bus
+ALTER TABLE ONLY public.message_bus
     ADD CONSTRAINT message_bus_pkey PRIMARY KEY (id);
 
 
 --
--- Name: muted_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: muted_users muted_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY muted_users
+ALTER TABLE ONLY public.muted_users
     ADD CONSTRAINT muted_users_pkey PRIMARY KEY (id);
 
 
 --
--- Name: notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: notifications notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY notifications
+ALTER TABLE ONLY public.notifications
     ADD CONSTRAINT notifications_pkey PRIMARY KEY (id);
 
 
 --
--- Name: oauth2_user_infos_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: oauth2_user_infos oauth2_user_infos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY oauth2_user_infos
+ALTER TABLE ONLY public.oauth2_user_infos
     ADD CONSTRAINT oauth2_user_infos_pkey PRIMARY KEY (id);
 
 
 --
--- Name: onceoff_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: onceoff_logs onceoff_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY onceoff_logs
+ALTER TABLE ONLY public.onceoff_logs
     ADD CONSTRAINT onceoff_logs_pkey PRIMARY KEY (id);
 
 
 --
--- Name: optimized_images_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: optimized_images optimized_images_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY optimized_images
+ALTER TABLE ONLY public.optimized_images
     ADD CONSTRAINT optimized_images_pkey PRIMARY KEY (id);
 
 
 --
--- Name: permalinks_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: permalinks permalinks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY permalinks
+ALTER TABLE ONLY public.permalinks
     ADD CONSTRAINT permalinks_pkey PRIMARY KEY (id);
 
 
 --
--- Name: plugin_store_rows_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: plugin_store_rows plugin_store_rows_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY plugin_store_rows
+ALTER TABLE ONLY public.plugin_store_rows
     ADD CONSTRAINT plugin_store_rows_pkey PRIMARY KEY (id);
 
 
 --
--- Name: post_action_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: post_action_types post_action_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY post_action_types
+ALTER TABLE ONLY public.post_action_types
     ADD CONSTRAINT post_action_types_pkey PRIMARY KEY (id);
 
 
 --
--- Name: post_actions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: post_actions post_actions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY post_actions
+ALTER TABLE ONLY public.post_actions
     ADD CONSTRAINT post_actions_pkey PRIMARY KEY (id);
 
 
 --
--- Name: post_custom_fields_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: post_custom_fields post_custom_fields_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY post_custom_fields
+ALTER TABLE ONLY public.post_custom_fields
     ADD CONSTRAINT post_custom_fields_pkey PRIMARY KEY (id);
 
 
 --
--- Name: post_details_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: post_details post_details_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY post_details
+ALTER TABLE ONLY public.post_details
     ADD CONSTRAINT post_details_pkey PRIMARY KEY (id);
 
 
 --
--- Name: post_reply_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: post_reply_keys post_reply_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY post_reply_keys
+ALTER TABLE ONLY public.post_reply_keys
     ADD CONSTRAINT post_reply_keys_pkey PRIMARY KEY (id);
 
 
 --
--- Name: post_revisions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: post_revisions post_revisions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY post_revisions
+ALTER TABLE ONLY public.post_revisions
     ADD CONSTRAINT post_revisions_pkey PRIMARY KEY (id);
 
 
 --
--- Name: post_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: post_stats post_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY post_stats
+ALTER TABLE ONLY public.post_stats
     ADD CONSTRAINT post_stats_pkey PRIMARY KEY (id);
 
 
 --
--- Name: post_uploads_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: post_uploads post_uploads_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY post_uploads
+ALTER TABLE ONLY public.post_uploads
     ADD CONSTRAINT post_uploads_pkey PRIMARY KEY (id);
 
 
 --
--- Name: posts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: posts posts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY posts
+ALTER TABLE ONLY public.posts
     ADD CONSTRAINT posts_pkey PRIMARY KEY (id);
 
 
 --
--- Name: posts_search_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: post_search_data posts_search_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY post_search_data
+ALTER TABLE ONLY public.post_search_data
     ADD CONSTRAINT posts_search_pkey PRIMARY KEY (post_id);
 
 
 --
--- Name: push_subscriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: push_subscriptions push_subscriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY push_subscriptions
+ALTER TABLE ONLY public.push_subscriptions
     ADD CONSTRAINT push_subscriptions_pkey PRIMARY KEY (id);
 
 
 --
--- Name: queued_posts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: queued_posts queued_posts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY queued_posts
+ALTER TABLE ONLY public.queued_posts
     ADD CONSTRAINT queued_posts_pkey PRIMARY KEY (id);
 
 
 --
--- Name: quoted_posts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: quoted_posts quoted_posts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY quoted_posts
+ALTER TABLE ONLY public.quoted_posts
     ADD CONSTRAINT quoted_posts_pkey PRIMARY KEY (id);
 
 
 --
--- Name: remote_themes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: remote_themes remote_themes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY remote_themes
+ALTER TABLE ONLY public.remote_themes
     ADD CONSTRAINT remote_themes_pkey PRIMARY KEY (id);
 
 
 --
--- Name: scheduler_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: scheduler_stats scheduler_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY scheduler_stats
+ALTER TABLE ONLY public.scheduler_stats
     ADD CONSTRAINT scheduler_stats_pkey PRIMARY KEY (id);
 
 
 --
--- Name: schema_migration_details_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: schema_migration_details schema_migration_details_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY schema_migration_details
+ALTER TABLE ONLY public.schema_migration_details
     ADD CONSTRAINT schema_migration_details_pkey PRIMARY KEY (id);
 
 
 --
--- Name: schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY schema_migrations
+ALTER TABLE ONLY public.schema_migrations
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
 
 
 --
--- Name: screened_emails_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: screened_emails screened_emails_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY screened_emails
+ALTER TABLE ONLY public.screened_emails
     ADD CONSTRAINT screened_emails_pkey PRIMARY KEY (id);
 
 
 --
--- Name: screened_ip_addresses_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: screened_ip_addresses screened_ip_addresses_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY screened_ip_addresses
+ALTER TABLE ONLY public.screened_ip_addresses
     ADD CONSTRAINT screened_ip_addresses_pkey PRIMARY KEY (id);
 
 
 --
--- Name: screened_urls_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: screened_urls screened_urls_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY screened_urls
+ALTER TABLE ONLY public.screened_urls
     ADD CONSTRAINT screened_urls_pkey PRIMARY KEY (id);
 
 
 --
--- Name: search_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: search_logs search_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY search_logs
+ALTER TABLE ONLY public.search_logs
     ADD CONSTRAINT search_logs_pkey PRIMARY KEY (id);
 
 
 --
--- Name: shared_drafts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: shared_drafts shared_drafts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY shared_drafts
+ALTER TABLE ONLY public.shared_drafts
     ADD CONSTRAINT shared_drafts_pkey PRIMARY KEY (id);
 
 
 --
--- Name: single_sign_on_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: single_sign_on_records single_sign_on_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY single_sign_on_records
+ALTER TABLE ONLY public.single_sign_on_records
     ADD CONSTRAINT single_sign_on_records_pkey PRIMARY KEY (id);
 
 
 --
--- Name: site_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: site_settings site_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY site_settings
+ALTER TABLE ONLY public.site_settings
     ADD CONSTRAINT site_settings_pkey PRIMARY KEY (id);
 
 
 --
--- Name: skipped_email_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: skipped_email_logs skipped_email_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY skipped_email_logs
+ALTER TABLE ONLY public.skipped_email_logs
     ADD CONSTRAINT skipped_email_logs_pkey PRIMARY KEY (id);
 
 
 --
--- Name: stylesheet_cache_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: stylesheet_cache stylesheet_cache_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY stylesheet_cache
+ALTER TABLE ONLY public.stylesheet_cache
     ADD CONSTRAINT stylesheet_cache_pkey PRIMARY KEY (id);
 
 
 --
--- Name: tag_group_memberships_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: tag_group_memberships tag_group_memberships_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY tag_group_memberships
+ALTER TABLE ONLY public.tag_group_memberships
     ADD CONSTRAINT tag_group_memberships_pkey PRIMARY KEY (id);
 
 
 --
--- Name: tag_group_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: tag_group_permissions tag_group_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY tag_group_permissions
+ALTER TABLE ONLY public.tag_group_permissions
     ADD CONSTRAINT tag_group_permissions_pkey PRIMARY KEY (id);
 
 
 --
--- Name: tag_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: tag_groups tag_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY tag_groups
+ALTER TABLE ONLY public.tag_groups
     ADD CONSTRAINT tag_groups_pkey PRIMARY KEY (id);
 
 
 --
--- Name: tag_search_data_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: tag_search_data tag_search_data_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY tag_search_data
+ALTER TABLE ONLY public.tag_search_data
     ADD CONSTRAINT tag_search_data_pkey PRIMARY KEY (tag_id);
 
 
 --
--- Name: tag_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: tag_users tag_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY tag_users
+ALTER TABLE ONLY public.tag_users
     ADD CONSTRAINT tag_users_pkey PRIMARY KEY (id);
 
 
 --
--- Name: tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: tags tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY tags
+ALTER TABLE ONLY public.tags
     ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
 
 
 --
--- Name: theme_fields_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: theme_fields theme_fields_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY theme_fields
+ALTER TABLE ONLY public.theme_fields
     ADD CONSTRAINT theme_fields_pkey PRIMARY KEY (id);
 
 
 --
--- Name: theme_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: theme_settings theme_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY theme_settings
+ALTER TABLE ONLY public.theme_settings
     ADD CONSTRAINT theme_settings_pkey PRIMARY KEY (id);
 
 
 --
--- Name: themes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: themes themes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY themes
+ALTER TABLE ONLY public.themes
     ADD CONSTRAINT themes_pkey PRIMARY KEY (id);
 
 
 --
--- Name: top_topics_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: top_topics top_topics_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY top_topics
+ALTER TABLE ONLY public.top_topics
     ADD CONSTRAINT top_topics_pkey PRIMARY KEY (id);
 
 
 --
--- Name: topic_allowed_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_allowed_groups topic_allowed_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_allowed_groups
+ALTER TABLE ONLY public.topic_allowed_groups
     ADD CONSTRAINT topic_allowed_groups_pkey PRIMARY KEY (id);
 
 
 --
--- Name: topic_allowed_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_allowed_users topic_allowed_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_allowed_users
+ALTER TABLE ONLY public.topic_allowed_users
     ADD CONSTRAINT topic_allowed_users_pkey PRIMARY KEY (id);
 
 
 --
--- Name: topic_custom_fields_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_custom_fields topic_custom_fields_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_custom_fields
+ALTER TABLE ONLY public.topic_custom_fields
     ADD CONSTRAINT topic_custom_fields_pkey PRIMARY KEY (id);
 
 
 --
--- Name: topic_embeds_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_embeds topic_embeds_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_embeds
+ALTER TABLE ONLY public.topic_embeds
     ADD CONSTRAINT topic_embeds_pkey PRIMARY KEY (id);
 
 
 --
--- Name: topic_invites_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_invites topic_invites_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_invites
+ALTER TABLE ONLY public.topic_invites
     ADD CONSTRAINT topic_invites_pkey PRIMARY KEY (id);
 
 
 --
--- Name: topic_link_clicks_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_link_clicks topic_link_clicks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_link_clicks
+ALTER TABLE ONLY public.topic_link_clicks
     ADD CONSTRAINT topic_link_clicks_pkey PRIMARY KEY (id);
 
 
 --
--- Name: topic_links_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_links topic_links_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_links
+ALTER TABLE ONLY public.topic_links
     ADD CONSTRAINT topic_links_pkey PRIMARY KEY (id);
 
 
 --
--- Name: topic_search_data_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_search_data topic_search_data_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_search_data
+ALTER TABLE ONLY public.topic_search_data
     ADD CONSTRAINT topic_search_data_pkey PRIMARY KEY (topic_id);
 
 
 --
--- Name: topic_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_tags topic_tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_tags
+ALTER TABLE ONLY public.topic_tags
     ADD CONSTRAINT topic_tags_pkey PRIMARY KEY (id);
 
 
 --
--- Name: topic_timers_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_timers topic_timers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_timers
+ALTER TABLE ONLY public.topic_timers
     ADD CONSTRAINT topic_timers_pkey PRIMARY KEY (id);
 
 
 --
--- Name: topic_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_users topic_users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topic_users
+ALTER TABLE ONLY public.topic_users
     ADD CONSTRAINT topic_users_pkey PRIMARY KEY (id);
 
 
 --
--- Name: topics_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: topics topics_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY topics
+ALTER TABLE ONLY public.topics
     ADD CONSTRAINT topics_pkey PRIMARY KEY (id);
 
 
 --
--- Name: translation_overrides_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: translation_overrides translation_overrides_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY translation_overrides
+ALTER TABLE ONLY public.translation_overrides
     ADD CONSTRAINT translation_overrides_pkey PRIMARY KEY (id);
 
 
 --
--- Name: twitter_user_infos_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: twitter_user_infos twitter_user_infos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY twitter_user_infos
+ALTER TABLE ONLY public.twitter_user_infos
     ADD CONSTRAINT twitter_user_infos_pkey PRIMARY KEY (id);
 
 
 --
--- Name: uploads_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: uploads uploads_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY uploads
+ALTER TABLE ONLY public.uploads
     ADD CONSTRAINT uploads_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_actions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_actions user_actions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_actions
+ALTER TABLE ONLY public.user_actions
     ADD CONSTRAINT user_actions_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_api_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_api_keys user_api_keys_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_api_keys
+ALTER TABLE ONLY public.user_api_keys
     ADD CONSTRAINT user_api_keys_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_archived_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_archived_messages user_archived_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_archived_messages
+ALTER TABLE ONLY public.user_archived_messages
     ADD CONSTRAINT user_archived_messages_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_auth_token_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_auth_token_logs user_auth_token_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_auth_token_logs
+ALTER TABLE ONLY public.user_auth_token_logs
     ADD CONSTRAINT user_auth_token_logs_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_auth_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_auth_tokens user_auth_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_auth_tokens
+ALTER TABLE ONLY public.user_auth_tokens
     ADD CONSTRAINT user_auth_tokens_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_avatars_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_avatars user_avatars_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_avatars
+ALTER TABLE ONLY public.user_avatars
     ADD CONSTRAINT user_avatars_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_badges_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_badges user_badges_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_badges
+ALTER TABLE ONLY public.user_badges
     ADD CONSTRAINT user_badges_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_custom_fields_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_custom_fields user_custom_fields_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_custom_fields
+ALTER TABLE ONLY public.user_custom_fields
     ADD CONSTRAINT user_custom_fields_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_emails_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_emails user_emails_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_emails
+ALTER TABLE ONLY public.user_emails
     ADD CONSTRAINT user_emails_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_exports_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_exports user_exports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_exports
+ALTER TABLE ONLY public.user_exports
     ADD CONSTRAINT user_exports_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_field_options_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_field_options user_field_options_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_field_options
+ALTER TABLE ONLY public.user_field_options
     ADD CONSTRAINT user_field_options_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_fields_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_fields user_fields_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_fields
+ALTER TABLE ONLY public.user_fields
     ADD CONSTRAINT user_fields_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_histories_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_histories user_histories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_histories
+ALTER TABLE ONLY public.user_histories
     ADD CONSTRAINT user_histories_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_open_ids_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_open_ids user_open_ids_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_open_ids
+ALTER TABLE ONLY public.user_open_ids
     ADD CONSTRAINT user_open_ids_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_profile_views_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_profile_views user_profile_views_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_profile_views
+ALTER TABLE ONLY public.user_profile_views
     ADD CONSTRAINT user_profile_views_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_profiles_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_profiles user_profiles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_profiles
+ALTER TABLE ONLY public.user_profiles
     ADD CONSTRAINT user_profiles_pkey PRIMARY KEY (user_id);
 
 
 --
--- Name: user_second_factors_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_second_factors user_second_factors_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_second_factors
+ALTER TABLE ONLY public.user_second_factors
     ADD CONSTRAINT user_second_factors_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_stats user_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_stats
+ALTER TABLE ONLY public.user_stats
     ADD CONSTRAINT user_stats_pkey PRIMARY KEY (user_id);
 
 
 --
--- Name: user_uploads_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_uploads user_uploads_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_uploads
+ALTER TABLE ONLY public.user_uploads
     ADD CONSTRAINT user_uploads_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_visits_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_visits user_visits_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_visits
+ALTER TABLE ONLY public.user_visits
     ADD CONSTRAINT user_visits_pkey PRIMARY KEY (id);
 
 
 --
--- Name: user_warnings_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_warnings user_warnings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_warnings
+ALTER TABLE ONLY public.user_warnings
     ADD CONSTRAINT user_warnings_pkey PRIMARY KEY (id);
 
 
 --
--- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY users
+ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
 
 
 --
--- Name: users_search_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: user_search_data users_search_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY user_search_data
+ALTER TABLE ONLY public.user_search_data
     ADD CONSTRAINT users_search_pkey PRIMARY KEY (user_id);
 
 
 --
--- Name: watched_words_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: watched_words watched_words_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY watched_words
+ALTER TABLE ONLY public.watched_words
     ADD CONSTRAINT watched_words_pkey PRIMARY KEY (id);
 
 
 --
--- Name: web_crawler_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: web_crawler_requests web_crawler_requests_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY web_crawler_requests
+ALTER TABLE ONLY public.web_crawler_requests
     ADD CONSTRAINT web_crawler_requests_pkey PRIMARY KEY (id);
 
 
 --
--- Name: web_hook_event_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: web_hook_event_types web_hook_event_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY web_hook_event_types
+ALTER TABLE ONLY public.web_hook_event_types
     ADD CONSTRAINT web_hook_event_types_pkey PRIMARY KEY (id);
 
 
 --
--- Name: web_hook_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: web_hook_events web_hook_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY web_hook_events
+ALTER TABLE ONLY public.web_hook_events
     ADD CONSTRAINT web_hook_events_pkey PRIMARY KEY (id);
 
 
 --
--- Name: web_hooks_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: web_hooks web_hooks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY web_hooks
+ALTER TABLE ONLY public.web_hooks
     ADD CONSTRAINT web_hooks_pkey PRIMARY KEY (id);
 
 
 --
--- Name: by_link; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: by_link; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX by_link ON public.topic_link_clicks USING btree (topic_link_id);
 
 
 --
--- Name: by_queue_status; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: by_queue_status; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX by_queue_status ON public.queued_posts USING btree (queue, state, created_at);
 
 
 --
--- Name: by_queue_status_topic; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: by_queue_status_topic; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX by_queue_status_topic ON public.queued_posts USING btree (topic_id, queue, state, created_at);
 
 
 --
--- Name: cat_featured_threads; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: cat_featured_threads; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX cat_featured_threads ON public.category_featured_topics USING btree (category_id, topic_id);
 
 
 --
--- Name: idx_category_tag_groups_ix1; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_category_tag_groups_ix1; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX idx_category_tag_groups_ix1 ON public.category_tag_groups USING btree (category_id, tag_group_id);
 
 
 --
--- Name: idx_category_tags_ix1; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_category_tags_ix1; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX idx_category_tags_ix1 ON public.category_tags USING btree (category_id, tag_id);
 
 
 --
--- Name: idx_category_tags_ix2; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_category_tags_ix2; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX idx_category_tags_ix2 ON public.category_tags USING btree (tag_id, category_id);
 
 
 --
--- Name: idx_category_users_u1; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_category_users_u1; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX idx_category_users_u1 ON public.category_users USING btree (user_id, category_id, notification_level);
 
 
 --
--- Name: idx_category_users_u2; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_category_users_u2; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX idx_category_users_u2 ON public.category_users USING btree (category_id, user_id, notification_level);
 
 
 --
--- Name: idx_notifications_speedup_unread_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_notifications_speedup_unread_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_notifications_speedup_unread_count ON public.notifications USING btree (user_id, notification_type) WHERE (NOT read);
 
 
 --
--- Name: idx_post_custom_fields_akismet; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_post_custom_fields_akismet; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_post_custom_fields_akismet ON public.post_custom_fields USING btree (post_id) WHERE (((name)::text = 'AKISMET_STATE'::text) AND (value = 'needs_review'::text));
 
 
 --
--- Name: idx_posts_created_at_topic_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_posts_created_at_topic_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_posts_created_at_topic_id ON public.posts USING btree (created_at, topic_id) WHERE (deleted_at IS NULL);
 
 
 --
--- Name: idx_posts_deleted_posts; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_posts_deleted_posts; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_posts_deleted_posts ON public.posts USING btree (topic_id, post_number) WHERE (deleted_at IS NOT NULL);
 
 
 --
--- Name: idx_posts_user_id_deleted_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_posts_user_id_deleted_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_posts_user_id_deleted_at ON public.posts USING btree (user_id) WHERE (deleted_at IS NULL);
 
 
 --
--- Name: idx_search_category; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_search_category; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_search_category ON public.category_search_data USING gin (search_data);
 
 
 --
--- Name: idx_search_post; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_search_post; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_search_post ON public.post_search_data USING gin (search_data);
 
 
 --
--- Name: idx_search_tag; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_search_tag; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_search_tag ON public.tag_search_data USING gin (search_data);
 
 
 --
--- Name: idx_search_topic; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_search_topic; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_search_topic ON public.topic_search_data USING gin (search_data);
 
 
 --
--- Name: idx_search_user; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_search_user; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_search_user ON public.user_search_data USING gin (search_data);
 
 
 --
--- Name: idx_tag_users_ix1; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_tag_users_ix1; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX idx_tag_users_ix1 ON public.tag_users USING btree (user_id, tag_id, notification_level);
 
 
 --
--- Name: idx_tag_users_ix2; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_tag_users_ix2; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX idx_tag_users_ix2 ON public.tag_users USING btree (tag_id, user_id, notification_level);
 
 
 --
--- Name: idx_topic_id_public_type_deleted_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_topic_id_public_type_deleted_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX idx_topic_id_public_type_deleted_at ON public.topic_timers USING btree (topic_id) WHERE ((public_type = true) AND (deleted_at IS NULL));
 
 
 --
--- Name: idx_topics_front_page; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_topics_front_page; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_topics_front_page ON public.topics USING btree (deleted_at, visible, archetype, category_id, id);
 
 
 --
--- Name: idx_topics_user_id_deleted_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_topics_user_id_deleted_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_topics_user_id_deleted_at ON public.topics USING btree (user_id) WHERE (deleted_at IS NULL);
 
 
 --
--- Name: idx_unique_actions; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_unique_actions; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX idx_unique_actions ON public.post_actions USING btree (user_id, post_action_type_id, post_id, targets_topic) WHERE (((deleted_at IS NULL) AND (disagreed_at IS NULL)) AND (deferred_at IS NULL));
-
-
---
--- Name: idx_unique_flags; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX idx_unique_flags ON public.post_actions USING btree (user_id, post_id, targets_topic) WHERE ((((deleted_at IS NULL) AND (disagreed_at IS NULL)) AND (deferred_at IS NULL)) AND (post_action_type_id = ANY (ARRAY[3, 4, 7, 8])));
+CREATE UNIQUE INDEX idx_unique_actions ON public.post_actions USING btree (user_id, post_action_type_id, post_id, targets_topic) WHERE ((deleted_at IS NULL) AND (disagreed_at IS NULL) AND (deferred_at IS NULL));
 
 
 --
--- Name: idx_unique_post_uploads; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_unique_flags; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX idx_unique_flags ON public.post_actions USING btree (user_id, post_id, targets_topic) WHERE ((deleted_at IS NULL) AND (disagreed_at IS NULL) AND (deferred_at IS NULL) AND (post_action_type_id = ANY (ARRAY[3, 4, 7, 8])));
+
+
+--
+-- Name: idx_unique_post_uploads; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX idx_unique_post_uploads ON public.post_uploads USING btree (post_id, upload_id);
 
 
 --
--- Name: idx_unique_rows; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_unique_rows; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX idx_unique_rows ON public.user_actions USING btree (action_type, user_id, target_topic_id, target_post_id, acting_user_id);
 
 
 --
--- Name: idx_user_actions_speed_up_user_all; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_user_actions_speed_up_user_all; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_user_actions_speed_up_user_all ON public.user_actions USING btree (user_id, created_at, action_type);
 
 
 --
--- Name: idx_users_admin; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_users_admin; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_users_admin ON public.users USING btree (id) WHERE admin;
 
 
 --
--- Name: idx_users_moderator; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_users_moderator; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idx_users_moderator ON public.users USING btree (id) WHERE moderator;
 
 
 --
--- Name: idx_web_hook_event_types_hooks_on_ids; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_web_hook_event_types_hooks_on_ids; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX idx_web_hook_event_types_hooks_on_ids ON public.web_hook_event_types_hooks USING btree (web_hook_event_type_id, web_hook_id);
 
 
 --
--- Name: idxtopicslug; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idxtopicslug; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX idxtopicslug ON public.topics USING btree (slug) WHERE ((deleted_at IS NULL) AND (slug IS NOT NULL));
 
 
 --
--- Name: index_api_keys_on_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_api_keys_on_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_api_keys_on_key ON public.api_keys USING btree (key);
 
 
 --
--- Name: index_api_keys_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_api_keys_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_api_keys_on_user_id ON public.api_keys USING btree (user_id);
 
 
 --
--- Name: index_application_requests_on_date_and_req_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_application_requests_on_date_and_req_type; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_application_requests_on_date_and_req_type ON public.application_requests USING btree (date, req_type);
 
 
 --
--- Name: index_badge_types_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_badge_types_on_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_badge_types_on_name ON public.badge_types USING btree (name);
 
 
 --
--- Name: index_badges_on_badge_type_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_badges_on_badge_type_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_badges_on_badge_type_id ON public.badges USING btree (badge_type_id);
 
 
 --
--- Name: index_badges_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_badges_on_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_badges_on_name ON public.badges USING btree (name);
 
 
 --
--- Name: index_categories_on_email_in; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_categories_on_email_in; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_categories_on_email_in ON public.categories USING btree (email_in);
 
 
 --
--- Name: index_categories_on_topic_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_categories_on_topic_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_categories_on_topic_count ON public.categories USING btree (topic_count);
 
 
 --
--- Name: index_categories_web_hooks_on_web_hook_id_and_category_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_categories_web_hooks_on_web_hook_id_and_category_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_categories_web_hooks_on_web_hook_id_and_category_id ON public.categories_web_hooks USING btree (web_hook_id, category_id);
 
 
 --
--- Name: index_category_custom_fields_on_category_id_and_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_category_custom_fields_on_category_id_and_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_category_custom_fields_on_category_id_and_name ON public.category_custom_fields USING btree (category_id, name);
 
 
 --
--- Name: index_category_featured_topics_on_category_id_and_rank; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_category_featured_topics_on_category_id_and_rank; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_category_featured_topics_on_category_id_and_rank ON public.category_featured_topics USING btree (category_id, rank);
 
 
 --
--- Name: index_category_tag_stats_on_category_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_category_tag_stats_on_category_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_category_tag_stats_on_category_id ON public.category_tag_stats USING btree (category_id);
 
 
 --
--- Name: index_category_tag_stats_on_category_id_and_tag_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_category_tag_stats_on_category_id_and_tag_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_category_tag_stats_on_category_id_and_tag_id ON public.category_tag_stats USING btree (category_id, tag_id);
 
 
 --
--- Name: index_category_tag_stats_on_category_id_and_topic_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_category_tag_stats_on_category_id_and_topic_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_category_tag_stats_on_category_id_and_topic_count ON public.category_tag_stats USING btree (category_id, topic_count);
 
 
 --
--- Name: index_category_tag_stats_on_tag_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_category_tag_stats_on_tag_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_category_tag_stats_on_tag_id ON public.category_tag_stats USING btree (tag_id);
 
 
 --
--- Name: index_child_themes_on_child_theme_id_and_parent_theme_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_child_themes_on_child_theme_id_and_parent_theme_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_child_themes_on_child_theme_id_and_parent_theme_id ON public.child_themes USING btree (child_theme_id, parent_theme_id);
 
 
 --
--- Name: index_child_themes_on_parent_theme_id_and_child_theme_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_child_themes_on_parent_theme_id_and_child_theme_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_child_themes_on_parent_theme_id_and_child_theme_id ON public.child_themes USING btree (parent_theme_id, child_theme_id);
 
 
 --
--- Name: index_color_scheme_colors_on_color_scheme_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_color_scheme_colors_on_color_scheme_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_color_scheme_colors_on_color_scheme_id ON public.color_scheme_colors USING btree (color_scheme_id);
 
 
 --
--- Name: index_custom_emojis_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_custom_emojis_on_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_custom_emojis_on_name ON public.custom_emojis USING btree (name);
 
 
 --
--- Name: index_directory_items_on_days_visited; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_directory_items_on_days_visited; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_directory_items_on_days_visited ON public.directory_items USING btree (days_visited);
 
 
 --
--- Name: index_directory_items_on_likes_given; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_directory_items_on_likes_given; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_directory_items_on_likes_given ON public.directory_items USING btree (likes_given);
 
 
 --
--- Name: index_directory_items_on_likes_received; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_directory_items_on_likes_received; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_directory_items_on_likes_received ON public.directory_items USING btree (likes_received);
 
 
 --
--- Name: index_directory_items_on_period_type_and_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_directory_items_on_period_type_and_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_directory_items_on_period_type_and_user_id ON public.directory_items USING btree (period_type, user_id);
 
 
 --
--- Name: index_directory_items_on_post_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_directory_items_on_post_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_directory_items_on_post_count ON public.directory_items USING btree (post_count);
 
 
 --
--- Name: index_directory_items_on_posts_read; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_directory_items_on_posts_read; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_directory_items_on_posts_read ON public.directory_items USING btree (posts_read);
 
 
 --
--- Name: index_directory_items_on_topic_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_directory_items_on_topic_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_directory_items_on_topic_count ON public.directory_items USING btree (topic_count);
 
 
 --
--- Name: index_directory_items_on_topics_entered; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_directory_items_on_topics_entered; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_directory_items_on_topics_entered ON public.directory_items USING btree (topics_entered);
 
 
 --
--- Name: index_draft_sequences_on_user_id_and_draft_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_draft_sequences_on_user_id_and_draft_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_draft_sequences_on_user_id_and_draft_key ON public.draft_sequences USING btree (user_id, draft_key);
 
 
 --
--- Name: index_drafts_on_user_id_and_draft_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_drafts_on_user_id_and_draft_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_drafts_on_user_id_and_draft_key ON public.drafts USING btree (user_id, draft_key);
 
 
 --
--- Name: index_email_change_requests_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_email_change_requests_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_email_change_requests_on_user_id ON public.email_change_requests USING btree (user_id);
 
 
 --
--- Name: index_email_logs_on_bounced; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_email_logs_on_bounced; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_email_logs_on_bounced ON public.email_logs USING btree (bounced);
 
 
 --
--- Name: index_email_logs_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_email_logs_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_email_logs_on_created_at ON public.email_logs USING btree (created_at DESC);
 
 
 --
--- Name: index_email_logs_on_message_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_email_logs_on_message_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_email_logs_on_message_id ON public.email_logs USING btree (message_id);
 
 
 --
--- Name: index_email_logs_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_email_logs_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_email_logs_on_post_id ON public.email_logs USING btree (post_id);
 
 
 --
--- Name: index_email_logs_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_email_logs_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_email_logs_on_user_id ON public.email_logs USING btree (user_id);
 
 
 --
--- Name: index_email_tokens_on_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_email_tokens_on_token; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_email_tokens_on_token ON public.email_tokens USING btree (token);
 
 
 --
--- Name: index_email_tokens_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_email_tokens_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_email_tokens_on_user_id ON public.email_tokens USING btree (user_id);
 
 
 --
--- Name: index_facebook_user_infos_on_facebook_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_facebook_user_infos_on_facebook_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_facebook_user_infos_on_facebook_user_id ON public.facebook_user_infos USING btree (facebook_user_id);
 
 
 --
--- Name: index_facebook_user_infos_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_facebook_user_infos_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_facebook_user_infos_on_user_id ON public.facebook_user_infos USING btree (user_id);
 
 
 --
--- Name: index_github_user_infos_on_github_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_github_user_infos_on_github_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_github_user_infos_on_github_user_id ON public.github_user_infos USING btree (github_user_id);
 
 
 --
--- Name: index_github_user_infos_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_github_user_infos_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_github_user_infos_on_user_id ON public.github_user_infos USING btree (user_id);
 
 
 --
--- Name: index_given_daily_likes_on_limit_reached_and_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_given_daily_likes_on_limit_reached_and_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_given_daily_likes_on_limit_reached_and_user_id ON public.given_daily_likes USING btree (limit_reached, user_id);
 
 
 --
--- Name: index_given_daily_likes_on_user_id_and_given_date; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_given_daily_likes_on_user_id_and_given_date; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_given_daily_likes_on_user_id_and_given_date ON public.given_daily_likes USING btree (user_id, given_date);
 
 
 --
--- Name: index_google_user_infos_on_google_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_google_user_infos_on_google_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_google_user_infos_on_google_user_id ON public.google_user_infos USING btree (google_user_id);
 
 
 --
--- Name: index_google_user_infos_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_google_user_infos_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_google_user_infos_on_user_id ON public.google_user_infos USING btree (user_id);
 
 
 --
--- Name: index_group_archived_messages_on_group_id_and_topic_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_group_archived_messages_on_group_id_and_topic_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_group_archived_messages_on_group_id_and_topic_id ON public.group_archived_messages USING btree (group_id, topic_id);
 
 
 --
--- Name: index_group_custom_fields_on_group_id_and_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_group_custom_fields_on_group_id_and_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_group_custom_fields_on_group_id_and_name ON public.group_custom_fields USING btree (group_id, name);
 
 
 --
--- Name: index_group_histories_on_acting_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_group_histories_on_acting_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_group_histories_on_acting_user_id ON public.group_histories USING btree (acting_user_id);
 
 
 --
--- Name: index_group_histories_on_action; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_group_histories_on_action; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_group_histories_on_action ON public.group_histories USING btree (action);
 
 
 --
--- Name: index_group_histories_on_group_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_group_histories_on_group_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_group_histories_on_group_id ON public.group_histories USING btree (group_id);
 
 
 --
--- Name: index_group_histories_on_target_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_group_histories_on_target_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_group_histories_on_target_user_id ON public.group_histories USING btree (target_user_id);
 
 
 --
--- Name: index_group_mentions_on_group_id_and_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_group_mentions_on_group_id_and_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_group_mentions_on_group_id_and_post_id ON public.group_mentions USING btree (group_id, post_id);
 
 
 --
--- Name: index_group_mentions_on_post_id_and_group_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_group_mentions_on_post_id_and_group_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_group_mentions_on_post_id_and_group_id ON public.group_mentions USING btree (post_id, group_id);
 
 
 --
--- Name: index_group_users_on_group_id_and_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_group_users_on_group_id_and_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_group_users_on_group_id_and_user_id ON public.group_users USING btree (group_id, user_id);
 
 
 --
--- Name: index_group_users_on_user_id_and_group_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_group_users_on_user_id_and_group_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_group_users_on_user_id_and_group_id ON public.group_users USING btree (user_id, group_id);
 
 
 --
--- Name: index_groups_on_incoming_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_groups_on_incoming_email; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_groups_on_incoming_email ON public.groups USING btree (incoming_email);
 
 
 --
--- Name: index_groups_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_groups_on_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_groups_on_name ON public.groups USING btree (name);
 
 
 --
--- Name: index_groups_web_hooks_on_web_hook_id_and_group_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_groups_web_hooks_on_web_hook_id_and_group_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_groups_web_hooks_on_web_hook_id_and_group_id ON public.groups_web_hooks USING btree (web_hook_id, group_id);
 
 
 --
--- Name: index_incoming_domains_on_name_and_https_and_port; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_incoming_domains_on_name_and_https_and_port; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_incoming_domains_on_name_and_https_and_port ON public.incoming_domains USING btree (name, https, port);
 
 
 --
--- Name: index_incoming_emails_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_incoming_emails_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_incoming_emails_on_created_at ON public.incoming_emails USING btree (created_at);
 
 
 --
--- Name: index_incoming_emails_on_error; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_incoming_emails_on_error; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_incoming_emails_on_error ON public.incoming_emails USING btree (error);
 
 
 --
--- Name: index_incoming_emails_on_message_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_incoming_emails_on_message_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_incoming_emails_on_message_id ON public.incoming_emails USING btree (message_id);
 
 
 --
--- Name: index_incoming_emails_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_incoming_emails_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_incoming_emails_on_post_id ON public.incoming_emails USING btree (post_id);
 
 
 --
--- Name: index_incoming_links_on_created_at_and_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_incoming_links_on_created_at_and_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_incoming_links_on_created_at_and_user_id ON public.incoming_links USING btree (created_at, user_id);
 
 
 --
--- Name: index_incoming_links_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_incoming_links_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_incoming_links_on_post_id ON public.incoming_links USING btree (post_id);
 
 
 --
--- Name: index_incoming_referers_on_path_and_incoming_domain_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_incoming_referers_on_path_and_incoming_domain_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_incoming_referers_on_path_and_incoming_domain_id ON public.incoming_referers USING btree (path, incoming_domain_id);
 
 
 --
--- Name: index_invites_on_email_and_invited_by_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_invites_on_email_and_invited_by_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_invites_on_email_and_invited_by_id ON public.invites USING btree (email, invited_by_id);
 
 
 --
--- Name: index_invites_on_invite_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_invites_on_invite_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_invites_on_invite_key ON public.invites USING btree (invite_key);
 
 
 --
--- Name: index_javascript_caches_on_digest; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_javascript_caches_on_digest; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_javascript_caches_on_digest ON public.javascript_caches USING btree (digest);
 
 
 --
--- Name: index_javascript_caches_on_theme_field_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_javascript_caches_on_theme_field_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_javascript_caches_on_theme_field_id ON public.javascript_caches USING btree (theme_field_id);
 
 
 --
--- Name: index_message_bus_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_message_bus_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_message_bus_on_created_at ON public.message_bus USING btree (created_at);
 
 
 --
--- Name: index_muted_users_on_muted_user_id_and_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_muted_users_on_muted_user_id_and_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_muted_users_on_muted_user_id_and_user_id ON public.muted_users USING btree (muted_user_id, user_id);
 
 
 --
--- Name: index_muted_users_on_user_id_and_muted_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_muted_users_on_user_id_and_muted_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_muted_users_on_user_id_and_muted_user_id ON public.muted_users USING btree (user_id, muted_user_id);
 
 
 --
--- Name: index_notifications_on_post_action_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_notifications_on_post_action_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_notifications_on_post_action_id ON public.notifications USING btree (post_action_id);
 
 
 --
--- Name: index_notifications_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_notifications_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_notifications_on_user_id_and_created_at ON public.notifications USING btree (user_id, created_at);
 
 
 --
--- Name: index_notifications_on_user_id_and_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_notifications_on_user_id_and_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_notifications_on_user_id_and_id ON public.notifications USING btree (user_id, id) WHERE ((notification_type = 6) AND (NOT read));
 
 
 --
--- Name: index_notifications_on_user_id_and_topic_id_and_post_number; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_notifications_on_user_id_and_topic_id_and_post_number; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_notifications_on_user_id_and_topic_id_and_post_number ON public.notifications USING btree (user_id, topic_id, post_number);
 
 
 --
--- Name: index_oauth2_user_infos_on_uid_and_provider; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_oauth2_user_infos_on_uid_and_provider; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_oauth2_user_infos_on_uid_and_provider ON public.oauth2_user_infos USING btree (uid, provider);
 
 
 --
--- Name: index_onceoff_logs_on_job_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_onceoff_logs_on_job_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_onceoff_logs_on_job_name ON public.onceoff_logs USING btree (job_name);
 
 
 --
--- Name: index_optimized_images_on_upload_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_optimized_images_on_upload_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_optimized_images_on_upload_id ON public.optimized_images USING btree (upload_id);
 
 
 --
--- Name: index_optimized_images_on_upload_id_and_width_and_height; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_optimized_images_on_upload_id_and_width_and_height; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_optimized_images_on_upload_id_and_width_and_height ON public.optimized_images USING btree (upload_id, width, height);
 
 
 --
--- Name: index_permalinks_on_url; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_permalinks_on_url; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_permalinks_on_url ON public.permalinks USING btree (url);
 
 
 --
--- Name: index_plugin_store_rows_on_plugin_name_and_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_plugin_store_rows_on_plugin_name_and_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_plugin_store_rows_on_plugin_name_and_key ON public.plugin_store_rows USING btree (plugin_name, key);
 
 
 --
--- Name: index_post_actions_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_post_actions_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_post_actions_on_post_id ON public.post_actions USING btree (post_id);
 
 
 --
--- Name: index_post_actions_on_user_id_and_post_action_type_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_post_actions_on_user_id_and_post_action_type_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_post_actions_on_user_id_and_post_action_type_id ON public.post_actions USING btree (user_id, post_action_type_id) WHERE (deleted_at IS NULL);
 
 
 --
--- Name: index_post_custom_fields_on_name_and_value; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_post_custom_fields_on_name_and_value; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_post_custom_fields_on_name_and_value ON public.post_custom_fields USING btree (name, "left"(value, 200));
 
 
 --
--- Name: index_post_custom_fields_on_post_id_and_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_post_custom_fields_on_post_id_and_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_post_custom_fields_on_post_id_and_name ON public.post_custom_fields USING btree (post_id, name);
 
 
 --
--- Name: index_post_details_on_post_id_and_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_post_details_on_post_id_and_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_post_details_on_post_id_and_key ON public.post_details USING btree (post_id, key);
 
 
 --
--- Name: index_post_replies_on_post_id_and_reply_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_post_replies_on_post_id_and_reply_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_post_replies_on_post_id_and_reply_id ON public.post_replies USING btree (post_id, reply_id);
 
 
 --
--- Name: index_post_reply_keys_on_reply_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_post_reply_keys_on_reply_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_post_reply_keys_on_reply_key ON public.post_reply_keys USING btree (reply_key);
 
 
 --
--- Name: index_post_reply_keys_on_user_id_and_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_post_reply_keys_on_user_id_and_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_post_reply_keys_on_user_id_and_post_id ON public.post_reply_keys USING btree (user_id, post_id);
 
 
 --
--- Name: index_post_revisions_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_post_revisions_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_post_revisions_on_post_id ON public.post_revisions USING btree (post_id);
 
 
 --
--- Name: index_post_revisions_on_post_id_and_number; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_post_revisions_on_post_id_and_number; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_post_revisions_on_post_id_and_number ON public.post_revisions USING btree (post_id, number);
 
 
 --
--- Name: index_post_stats_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_post_stats_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_post_stats_on_post_id ON public.post_stats USING btree (post_id);
 
 
 --
--- Name: index_post_timings_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_post_timings_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_post_timings_on_user_id ON public.post_timings USING btree (user_id);
 
 
 --
--- Name: index_post_uploads_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_post_uploads_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_post_uploads_on_post_id ON public.post_uploads USING btree (post_id);
 
 
 --
--- Name: index_post_uploads_on_upload_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_post_uploads_on_upload_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_post_uploads_on_upload_id ON public.post_uploads USING btree (upload_id);
 
 
 --
--- Name: index_posts_on_reply_to_post_number; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_posts_on_reply_to_post_number; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_posts_on_reply_to_post_number ON public.posts USING btree (reply_to_post_number);
 
 
 --
--- Name: index_posts_on_topic_id_and_percent_rank; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_posts_on_topic_id_and_percent_rank; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_posts_on_topic_id_and_percent_rank ON public.posts USING btree (topic_id, percent_rank);
 
 
 --
--- Name: index_posts_on_topic_id_and_post_number; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_posts_on_topic_id_and_post_number; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_posts_on_topic_id_and_post_number ON public.posts USING btree (topic_id, post_number);
 
 
 --
--- Name: index_posts_on_topic_id_and_sort_order; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_posts_on_topic_id_and_sort_order; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_posts_on_topic_id_and_sort_order ON public.posts USING btree (topic_id, sort_order);
 
 
 --
--- Name: index_posts_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_posts_on_user_id_and_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_posts_on_user_id_and_created_at ON public.posts USING btree (user_id, created_at);
 
 
 --
--- Name: index_quoted_posts_on_post_id_and_quoted_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_quoted_posts_on_post_id_and_quoted_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_quoted_posts_on_post_id_and_quoted_post_id ON public.quoted_posts USING btree (post_id, quoted_post_id);
 
 
 --
--- Name: index_quoted_posts_on_quoted_post_id_and_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_quoted_posts_on_quoted_post_id_and_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_quoted_posts_on_quoted_post_id_and_post_id ON public.quoted_posts USING btree (quoted_post_id, post_id);
 
 
 --
--- Name: index_schema_migration_details_on_version; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_schema_migration_details_on_version; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_schema_migration_details_on_version ON public.schema_migration_details USING btree (version);
 
 
 --
--- Name: index_screened_emails_on_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_screened_emails_on_email; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_screened_emails_on_email ON public.screened_emails USING btree (email);
 
 
 --
--- Name: index_screened_emails_on_last_match_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_screened_emails_on_last_match_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_screened_emails_on_last_match_at ON public.screened_emails USING btree (last_match_at);
 
 
 --
--- Name: index_screened_ip_addresses_on_ip_address; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_screened_ip_addresses_on_ip_address; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_screened_ip_addresses_on_ip_address ON public.screened_ip_addresses USING btree (ip_address);
 
 
 --
--- Name: index_screened_ip_addresses_on_last_match_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_screened_ip_addresses_on_last_match_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_screened_ip_addresses_on_last_match_at ON public.screened_ip_addresses USING btree (last_match_at);
 
 
 --
--- Name: index_screened_urls_on_last_match_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_screened_urls_on_last_match_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_screened_urls_on_last_match_at ON public.screened_urls USING btree (last_match_at);
 
 
 --
--- Name: index_screened_urls_on_url; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_screened_urls_on_url; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_screened_urls_on_url ON public.screened_urls USING btree (url);
 
 
 --
--- Name: index_shared_drafts_on_category_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_shared_drafts_on_category_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_shared_drafts_on_category_id ON public.shared_drafts USING btree (category_id);
 
 
 --
--- Name: index_shared_drafts_on_topic_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_shared_drafts_on_topic_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_shared_drafts_on_topic_id ON public.shared_drafts USING btree (topic_id);
 
 
 --
--- Name: index_single_sign_on_records_on_external_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_single_sign_on_records_on_external_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_single_sign_on_records_on_external_id ON public.single_sign_on_records USING btree (external_id);
 
 
 --
--- Name: index_skipped_email_logs_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_skipped_email_logs_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_skipped_email_logs_on_created_at ON public.skipped_email_logs USING btree (created_at);
 
 
 --
--- Name: index_skipped_email_logs_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_skipped_email_logs_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_skipped_email_logs_on_post_id ON public.skipped_email_logs USING btree (post_id);
 
 
 --
--- Name: index_skipped_email_logs_on_reason_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_skipped_email_logs_on_reason_type; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_skipped_email_logs_on_reason_type ON public.skipped_email_logs USING btree (reason_type);
 
 
 --
--- Name: index_skipped_email_logs_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_skipped_email_logs_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_skipped_email_logs_on_user_id ON public.skipped_email_logs USING btree (user_id);
 
 
 --
--- Name: index_stylesheet_cache_on_target_and_digest; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_stylesheet_cache_on_target_and_digest; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_stylesheet_cache_on_target_and_digest ON public.stylesheet_cache USING btree (target, digest);
 
 
 --
--- Name: index_tag_group_memberships_on_tag_group_id_and_tag_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_tag_group_memberships_on_tag_group_id_and_tag_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_tag_group_memberships_on_tag_group_id_and_tag_id ON public.tag_group_memberships USING btree (tag_group_id, tag_id);
 
 
 --
--- Name: index_tag_group_permissions_on_group_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_tag_group_permissions_on_group_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_tag_group_permissions_on_group_id ON public.tag_group_permissions USING btree (group_id);
 
 
 --
--- Name: index_tag_group_permissions_on_tag_group_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_tag_group_permissions_on_tag_group_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_tag_group_permissions_on_tag_group_id ON public.tag_group_permissions USING btree (tag_group_id);
 
 
 --
--- Name: index_tags_on_lower_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_tags_on_lower_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_tags_on_lower_name ON public.tags USING btree (lower((name)::text));
 
 
 --
--- Name: index_tags_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_tags_on_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_tags_on_name ON public.tags USING btree (name);
 
 
 --
--- Name: index_themes_on_remote_theme_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_themes_on_remote_theme_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_themes_on_remote_theme_id ON public.themes USING btree (remote_theme_id);
 
 
 --
--- Name: index_top_topics_on_all_score; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_all_score; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_all_score ON public.top_topics USING btree (all_score);
 
 
 --
--- Name: index_top_topics_on_daily_likes_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_daily_likes_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_daily_likes_count ON public.top_topics USING btree (daily_likes_count DESC);
 
 
 --
--- Name: index_top_topics_on_daily_op_likes_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_daily_op_likes_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_daily_op_likes_count ON public.top_topics USING btree (daily_op_likes_count);
 
 
 --
--- Name: index_top_topics_on_daily_posts_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_daily_posts_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_daily_posts_count ON public.top_topics USING btree (daily_posts_count DESC);
 
 
 --
--- Name: index_top_topics_on_daily_score; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_daily_score; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_daily_score ON public.top_topics USING btree (daily_score);
 
 
 --
--- Name: index_top_topics_on_daily_views_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_daily_views_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_daily_views_count ON public.top_topics USING btree (daily_views_count DESC);
 
 
 --
--- Name: index_top_topics_on_monthly_likes_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_monthly_likes_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_monthly_likes_count ON public.top_topics USING btree (monthly_likes_count DESC);
 
 
 --
--- Name: index_top_topics_on_monthly_op_likes_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_monthly_op_likes_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_monthly_op_likes_count ON public.top_topics USING btree (monthly_op_likes_count);
 
 
 --
--- Name: index_top_topics_on_monthly_posts_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_monthly_posts_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_monthly_posts_count ON public.top_topics USING btree (monthly_posts_count DESC);
 
 
 --
--- Name: index_top_topics_on_monthly_score; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_monthly_score; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_monthly_score ON public.top_topics USING btree (monthly_score);
 
 
 --
--- Name: index_top_topics_on_monthly_views_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_monthly_views_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_monthly_views_count ON public.top_topics USING btree (monthly_views_count DESC);
 
 
 --
--- Name: index_top_topics_on_quarterly_likes_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_quarterly_likes_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_quarterly_likes_count ON public.top_topics USING btree (quarterly_likes_count);
 
 
 --
--- Name: index_top_topics_on_quarterly_op_likes_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_quarterly_op_likes_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_quarterly_op_likes_count ON public.top_topics USING btree (quarterly_op_likes_count);
 
 
 --
--- Name: index_top_topics_on_quarterly_posts_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_quarterly_posts_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_quarterly_posts_count ON public.top_topics USING btree (quarterly_posts_count);
 
 
 --
--- Name: index_top_topics_on_quarterly_views_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_quarterly_views_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_quarterly_views_count ON public.top_topics USING btree (quarterly_views_count);
 
 
 --
--- Name: index_top_topics_on_topic_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_topic_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_top_topics_on_topic_id ON public.top_topics USING btree (topic_id);
 
 
 --
--- Name: index_top_topics_on_weekly_likes_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_weekly_likes_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_weekly_likes_count ON public.top_topics USING btree (weekly_likes_count DESC);
 
 
 --
--- Name: index_top_topics_on_weekly_op_likes_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_weekly_op_likes_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_weekly_op_likes_count ON public.top_topics USING btree (weekly_op_likes_count);
 
 
 --
--- Name: index_top_topics_on_weekly_posts_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_weekly_posts_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_weekly_posts_count ON public.top_topics USING btree (weekly_posts_count DESC);
 
 
 --
--- Name: index_top_topics_on_weekly_score; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_weekly_score; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_weekly_score ON public.top_topics USING btree (weekly_score);
 
 
 --
--- Name: index_top_topics_on_weekly_views_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_weekly_views_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_weekly_views_count ON public.top_topics USING btree (weekly_views_count DESC);
 
 
 --
--- Name: index_top_topics_on_yearly_likes_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_yearly_likes_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_yearly_likes_count ON public.top_topics USING btree (yearly_likes_count DESC);
 
 
 --
--- Name: index_top_topics_on_yearly_op_likes_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_yearly_op_likes_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_yearly_op_likes_count ON public.top_topics USING btree (yearly_op_likes_count);
 
 
 --
--- Name: index_top_topics_on_yearly_posts_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_yearly_posts_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_yearly_posts_count ON public.top_topics USING btree (yearly_posts_count DESC);
 
 
 --
--- Name: index_top_topics_on_yearly_score; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_yearly_score; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_yearly_score ON public.top_topics USING btree (yearly_score);
 
 
 --
--- Name: index_top_topics_on_yearly_views_count; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_top_topics_on_yearly_views_count; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_top_topics_on_yearly_views_count ON public.top_topics USING btree (yearly_views_count DESC);
 
 
 --
--- Name: index_topic_allowed_groups_on_group_id_and_topic_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topic_allowed_groups_on_group_id_and_topic_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_topic_allowed_groups_on_group_id_and_topic_id ON public.topic_allowed_groups USING btree (group_id, topic_id);
 
 
 --
--- Name: index_topic_allowed_groups_on_topic_id_and_group_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topic_allowed_groups_on_topic_id_and_group_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_topic_allowed_groups_on_topic_id_and_group_id ON public.topic_allowed_groups USING btree (topic_id, group_id);
 
 
 --
--- Name: index_topic_allowed_users_on_topic_id_and_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topic_allowed_users_on_topic_id_and_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_topic_allowed_users_on_topic_id_and_user_id ON public.topic_allowed_users USING btree (topic_id, user_id);
 
 
 --
--- Name: index_topic_allowed_users_on_user_id_and_topic_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topic_allowed_users_on_user_id_and_topic_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_topic_allowed_users_on_user_id_and_topic_id ON public.topic_allowed_users USING btree (user_id, topic_id);
 
 
 --
--- Name: index_topic_custom_fields_on_topic_id_and_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topic_custom_fields_on_topic_id_and_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_topic_custom_fields_on_topic_id_and_name ON public.topic_custom_fields USING btree (topic_id, name);
 
 
 --
--- Name: index_topic_embeds_on_embed_url; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topic_embeds_on_embed_url; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_topic_embeds_on_embed_url ON public.topic_embeds USING btree (embed_url);
 
 
 --
--- Name: index_topic_invites_on_invite_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topic_invites_on_invite_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_topic_invites_on_invite_id ON public.topic_invites USING btree (invite_id);
 
 
 --
--- Name: index_topic_invites_on_topic_id_and_invite_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topic_invites_on_topic_id_and_invite_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_topic_invites_on_topic_id_and_invite_id ON public.topic_invites USING btree (topic_id, invite_id);
 
 
 --
--- Name: index_topic_links_on_extension; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topic_links_on_extension; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_topic_links_on_extension ON public.topic_links USING btree (extension);
 
 
 --
--- Name: index_topic_links_on_link_post_id_and_reflection; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topic_links_on_link_post_id_and_reflection; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_topic_links_on_link_post_id_and_reflection ON public.topic_links USING btree (link_post_id, reflection);
 
 
 --
--- Name: index_topic_links_on_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topic_links_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_topic_links_on_post_id ON public.topic_links USING btree (post_id);
 
 
 --
--- Name: index_topic_links_on_topic_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topic_links_on_topic_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_topic_links_on_topic_id ON public.topic_links USING btree (topic_id);
 
 
 --
--- Name: index_topic_tags_on_topic_id_and_tag_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topic_tags_on_topic_id_and_tag_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_topic_tags_on_topic_id_and_tag_id ON public.topic_tags USING btree (topic_id, tag_id);
 
 
 --
--- Name: index_topic_timers_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topic_timers_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_topic_timers_on_user_id ON public.topic_timers USING btree (user_id);
 
 
 --
--- Name: index_topic_users_on_topic_id_and_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topic_users_on_topic_id_and_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_topic_users_on_topic_id_and_user_id ON public.topic_users USING btree (topic_id, user_id);
 
 
 --
--- Name: index_topic_users_on_user_id_and_topic_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topic_users_on_user_id_and_topic_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_topic_users_on_user_id_and_topic_id ON public.topic_users USING btree (user_id, topic_id);
 
 
 --
--- Name: index_topic_views_on_topic_id_and_viewed_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topic_views_on_topic_id_and_viewed_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_topic_views_on_topic_id_and_viewed_at ON public.topic_views USING btree (topic_id, viewed_at);
 
 
 --
--- Name: index_topic_views_on_user_id_and_viewed_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topic_views_on_user_id_and_viewed_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_topic_views_on_user_id_and_viewed_at ON public.topic_views USING btree (user_id, viewed_at);
 
 
 --
--- Name: index_topic_views_on_viewed_at_and_topic_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topic_views_on_viewed_at_and_topic_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_topic_views_on_viewed_at_and_topic_id ON public.topic_views USING btree (viewed_at, topic_id);
 
 
 --
--- Name: index_topics_on_bumped_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topics_on_bumped_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_topics_on_bumped_at ON public.topics USING btree (bumped_at DESC);
 
 
 --
--- Name: index_topics_on_created_at_and_visible; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topics_on_created_at_and_visible; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_topics_on_created_at_and_visible ON public.topics USING btree (created_at, visible) WHERE ((deleted_at IS NULL) AND ((archetype)::text <> 'private_message'::text));
 
 
 --
--- Name: index_topics_on_id_and_deleted_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topics_on_id_and_deleted_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_topics_on_id_and_deleted_at ON public.topics USING btree (id, deleted_at);
 
 
 --
--- Name: index_topics_on_lower_title; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topics_on_lower_title; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_topics_on_lower_title ON public.topics USING btree (lower((title)::text));
 
 
 --
--- Name: index_topics_on_pinned_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topics_on_pinned_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_topics_on_pinned_at ON public.topics USING btree (pinned_at) WHERE (pinned_at IS NOT NULL);
 
 
 --
--- Name: index_topics_on_pinned_globally; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_topics_on_pinned_globally; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_topics_on_pinned_globally ON public.topics USING btree (pinned_globally) WHERE pinned_globally;
 
 
 --
--- Name: index_translation_overrides_on_locale_and_translation_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_translation_overrides_on_locale_and_translation_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_translation_overrides_on_locale_and_translation_key ON public.translation_overrides USING btree (locale, translation_key);
 
 
 --
--- Name: index_twitter_user_infos_on_twitter_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_twitter_user_infos_on_twitter_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_twitter_user_infos_on_twitter_user_id ON public.twitter_user_infos USING btree (twitter_user_id);
 
 
 --
--- Name: index_twitter_user_infos_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_twitter_user_infos_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_twitter_user_infos_on_user_id ON public.twitter_user_infos USING btree (user_id);
 
 
 --
--- Name: index_unsubscribe_keys_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_unsubscribe_keys_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_unsubscribe_keys_on_created_at ON public.unsubscribe_keys USING btree (created_at);
 
 
 --
--- Name: index_uploads_on_extension; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_uploads_on_extension; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_uploads_on_extension ON public.uploads USING btree (lower((extension)::text));
 
 
 --
--- Name: index_uploads_on_id_and_url; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_uploads_on_id_and_url; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_uploads_on_id_and_url ON public.uploads USING btree (id, url);
 
 
 --
--- Name: index_uploads_on_sha1; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_uploads_on_sha1; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_uploads_on_sha1 ON public.uploads USING btree (sha1);
 
 
 --
--- Name: index_uploads_on_url; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_uploads_on_url; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_uploads_on_url ON public.uploads USING btree (url);
 
 
 --
--- Name: index_uploads_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_uploads_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_uploads_on_user_id ON public.uploads USING btree (user_id);
 
 
 --
--- Name: index_user_actions_on_acting_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_actions_on_acting_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_actions_on_acting_user_id ON public.user_actions USING btree (acting_user_id);
 
 
 --
--- Name: index_user_actions_on_target_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_actions_on_target_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_actions_on_target_post_id ON public.user_actions USING btree (target_post_id);
 
 
 --
--- Name: index_user_actions_on_user_id_and_action_type; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_actions_on_user_id_and_action_type; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_actions_on_user_id_and_action_type ON public.user_actions USING btree (user_id, action_type);
 
 
 --
--- Name: index_user_api_keys_on_client_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_api_keys_on_client_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_user_api_keys_on_client_id ON public.user_api_keys USING btree (client_id);
 
 
 --
--- Name: index_user_api_keys_on_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_api_keys_on_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_user_api_keys_on_key ON public.user_api_keys USING btree (key);
 
 
 --
--- Name: index_user_api_keys_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_api_keys_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_api_keys_on_user_id ON public.user_api_keys USING btree (user_id);
 
 
 --
--- Name: index_user_archived_messages_on_user_id_and_topic_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_archived_messages_on_user_id_and_topic_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_user_archived_messages_on_user_id_and_topic_id ON public.user_archived_messages USING btree (user_id, topic_id);
 
 
 --
--- Name: index_user_auth_tokens_on_auth_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_auth_tokens_on_auth_token; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_user_auth_tokens_on_auth_token ON public.user_auth_tokens USING btree (auth_token);
 
 
 --
--- Name: index_user_auth_tokens_on_prev_auth_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_auth_tokens_on_prev_auth_token; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_user_auth_tokens_on_prev_auth_token ON public.user_auth_tokens USING btree (prev_auth_token);
 
 
 --
--- Name: index_user_avatars_on_custom_upload_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_avatars_on_custom_upload_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_avatars_on_custom_upload_id ON public.user_avatars USING btree (custom_upload_id);
 
 
 --
--- Name: index_user_avatars_on_gravatar_upload_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_avatars_on_gravatar_upload_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_avatars_on_gravatar_upload_id ON public.user_avatars USING btree (gravatar_upload_id);
 
 
 --
--- Name: index_user_avatars_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_avatars_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_avatars_on_user_id ON public.user_avatars USING btree (user_id);
 
 
 --
--- Name: index_user_badges_on_badge_id_and_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_badges_on_badge_id_and_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_badges_on_badge_id_and_user_id ON public.user_badges USING btree (badge_id, user_id);
 
 
 --
--- Name: index_user_badges_on_badge_id_and_user_id_and_post_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_badges_on_badge_id_and_user_id_and_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_user_badges_on_badge_id_and_user_id_and_post_id ON public.user_badges USING btree (badge_id, user_id, post_id) WHERE (post_id IS NOT NULL);
 
 
 --
--- Name: index_user_badges_on_badge_id_and_user_id_and_seq; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_badges_on_badge_id_and_user_id_and_seq; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_user_badges_on_badge_id_and_user_id_and_seq ON public.user_badges USING btree (badge_id, user_id, seq) WHERE (post_id IS NULL);
 
 
 --
--- Name: index_user_badges_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_badges_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_badges_on_user_id ON public.user_badges USING btree (user_id);
 
 
 --
--- Name: index_user_custom_fields_on_user_id_and_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_custom_fields_on_user_id_and_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_custom_fields_on_user_id_and_name ON public.user_custom_fields USING btree (user_id, name);
 
 
 --
--- Name: index_user_emails_on_email; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_emails_on_email; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_user_emails_on_email ON public.user_emails USING btree (lower((email)::text));
 
 
 --
--- Name: index_user_emails_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_emails_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_emails_on_user_id ON public.user_emails USING btree (user_id);
 
 
 --
--- Name: index_user_emails_on_user_id_and_primary; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_emails_on_user_id_and_primary; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_user_emails_on_user_id_and_primary ON public.user_emails USING btree (user_id, "primary") WHERE "primary";
 
 
 --
--- Name: index_user_histories_on_acting_user_id_and_action_and_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_histories_on_acting_user_id_and_action_and_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_histories_on_acting_user_id_and_action_and_id ON public.user_histories USING btree (acting_user_id, action, id);
 
 
 --
--- Name: index_user_histories_on_action_and_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_histories_on_action_and_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_histories_on_action_and_id ON public.user_histories USING btree (action, id);
 
 
 --
--- Name: index_user_histories_on_category_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_histories_on_category_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_histories_on_category_id ON public.user_histories USING btree (category_id);
 
 
 --
--- Name: index_user_histories_on_subject_and_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_histories_on_subject_and_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_histories_on_subject_and_id ON public.user_histories USING btree (subject, id);
 
 
 --
--- Name: index_user_histories_on_target_user_id_and_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_histories_on_target_user_id_and_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_histories_on_target_user_id_and_id ON public.user_histories USING btree (target_user_id, id);
 
 
 --
--- Name: index_user_open_ids_on_url; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_open_ids_on_url; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_open_ids_on_url ON public.user_open_ids USING btree (url);
 
 
 --
--- Name: index_user_options_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_options_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_user_options_on_user_id ON public.user_options USING btree (user_id);
 
 
 --
--- Name: index_user_profile_views_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_profile_views_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_profile_views_on_user_id ON public.user_profile_views USING btree (user_id);
 
 
 --
--- Name: index_user_profile_views_on_user_profile_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_profile_views_on_user_profile_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_profile_views_on_user_profile_id ON public.user_profile_views USING btree (user_profile_id);
 
 
 --
--- Name: index_user_profiles_on_bio_cooked_version; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_profiles_on_bio_cooked_version; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_profiles_on_bio_cooked_version ON public.user_profiles USING btree (bio_cooked_version);
 
 
 --
--- Name: index_user_profiles_on_card_background; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_profiles_on_card_background; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_profiles_on_card_background ON public.user_profiles USING btree (card_background);
 
 
 --
--- Name: index_user_profiles_on_profile_background; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_profiles_on_profile_background; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_profiles_on_profile_background ON public.user_profiles USING btree (profile_background);
 
 
 --
--- Name: index_user_second_factors_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_second_factors_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_second_factors_on_user_id ON public.user_second_factors USING btree (user_id);
 
 
 --
--- Name: index_user_uploads_on_upload_id_and_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_uploads_on_upload_id_and_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_user_uploads_on_upload_id_and_user_id ON public.user_uploads USING btree (upload_id, user_id);
 
 
 --
--- Name: index_user_visits_on_user_id_and_visited_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_visits_on_user_id_and_visited_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_user_visits_on_user_id_and_visited_at ON public.user_visits USING btree (user_id, visited_at);
 
 
 --
--- Name: index_user_visits_on_user_id_and_visited_at_and_time_read; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_visits_on_user_id_and_visited_at_and_time_read; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_visits_on_user_id_and_visited_at_and_time_read ON public.user_visits USING btree (user_id, visited_at, time_read);
 
 
 --
--- Name: index_user_visits_on_visited_at_and_mobile; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_visits_on_visited_at_and_mobile; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_visits_on_visited_at_and_mobile ON public.user_visits USING btree (visited_at, mobile);
 
 
 --
--- Name: index_user_warnings_on_topic_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_warnings_on_topic_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_user_warnings_on_topic_id ON public.user_warnings USING btree (topic_id);
 
 
 --
--- Name: index_user_warnings_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_user_warnings_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_user_warnings_on_user_id ON public.user_warnings USING btree (user_id);
 
 
 --
--- Name: index_users_on_last_posted_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_users_on_last_posted_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_users_on_last_posted_at ON public.users USING btree (last_posted_at);
 
 
 --
--- Name: index_users_on_last_seen_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_users_on_last_seen_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_users_on_last_seen_at ON public.users USING btree (last_seen_at);
 
 
 --
--- Name: index_users_on_uploaded_avatar_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_users_on_uploaded_avatar_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_users_on_uploaded_avatar_id ON public.users USING btree (uploaded_avatar_id);
 
 
 --
--- Name: index_users_on_username; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_users_on_username; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_users_on_username ON public.users USING btree (username);
 
 
 --
--- Name: index_users_on_username_lower; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_users_on_username_lower; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_users_on_username_lower ON public.users USING btree (username_lower);
 
 
 --
--- Name: index_watched_words_on_action_and_word; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_watched_words_on_action_and_word; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_watched_words_on_action_and_word ON public.watched_words USING btree (action, word);
 
 
 --
--- Name: index_web_crawler_requests_on_date_and_user_agent; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_web_crawler_requests_on_date_and_user_agent; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_web_crawler_requests_on_date_and_user_agent ON public.web_crawler_requests USING btree (date, user_agent);
 
 
 --
--- Name: index_web_hook_events_on_web_hook_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_web_hook_events_on_web_hook_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_web_hook_events_on_web_hook_id ON public.web_hook_events USING btree (web_hook_id);
 
 
 --
--- Name: post_timings_summary; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: post_timings_summary; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX post_timings_summary ON public.post_timings USING btree (topic_id, post_number);
 
 
 --
--- Name: post_timings_unique; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: post_timings_unique; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX post_timings_unique ON public.post_timings USING btree (topic_id, post_number, user_id);
 
 
 --
--- Name: theme_field_unique_index; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: theme_field_unique_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX theme_field_unique_index ON public.theme_fields USING btree (theme_id, target_id, type_id, name);
 
 
 --
--- Name: topic_custom_fields_value_key_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: topic_custom_fields_value_key_idx; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX topic_custom_fields_value_key_idx ON public.topic_custom_fields USING btree (value, name) WHERE ((value IS NOT NULL) AND (char_length(value) < 400));
 
 
 --
--- Name: uniq_ip_or_user_id_topic_views; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: uniq_ip_or_user_id_topic_views; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX uniq_ip_or_user_id_topic_views ON public.topic_views USING btree (user_id, ip_address, topic_id);
 
 
 --
--- Name: unique_index_categories_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: unique_index_categories_on_name; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX unique_index_categories_on_name ON public.categories USING btree ((COALESCE(parent_category_id, (-1))), name);
+CREATE UNIQUE INDEX unique_index_categories_on_name ON public.categories USING btree (COALESCE(parent_category_id, '-1'::integer), name);
 
 
 --
--- Name: unique_post_links; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: unique_post_links; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX unique_post_links ON public.topic_links USING btree (topic_id, post_id, url);
 
 
 --
--- Name: unique_profile_view_user_or_ip; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: unique_profile_view_user_or_ip; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX unique_profile_view_user_or_ip ON public.user_profile_views USING btree (viewed_at, user_id, ip_address, user_profile_id);
@@ -8738,7 +8836,7 @@ CREATE UNIQUE INDEX unique_profile_view_user_or_ip ON public.user_profile_views 
 -- PostgreSQL database dump complete
 --
 
-SET search_path TO "$user",public;
+SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20000225050318'),

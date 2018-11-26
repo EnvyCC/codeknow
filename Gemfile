@@ -29,12 +29,12 @@ gem 'mini_mime'
 gem 'mini_suffix'
 
 gem 'hiredis'
-gem 'redis', '3.2.1', require:  ["redis", "redis/connection/hiredis"]
-gem 'redis-namespace', '1.5.0'
+gem 'redis', require:  ["redis", "redis/connection/hiredis"]
+gem 'redis-namespace'
 
 gem 'active_model_serializers', '~> 0.8.3'
 
-gem 'onebox', '1.8.65'
+gem 'onebox', '1.8.68'
 
 gem 'http_accept_language', '~>2.0.5', require: false
 
@@ -87,7 +87,7 @@ gem 'rake'
 gem 'thor', require: false
 gem 'rinku'
 gem 'sanitize'
-gem 'sidekiq', '4.2.10'
+gem 'sidekiq'
 gem 'mini_scheduler'
 
 # for sidekiq web
